@@ -1,6 +1,6 @@
 # Tasks: Qdrant Client Integration
 
-**Input**: Design documents from `/specs/006-qdrant-client-integration/`  
+**Input**: Design documents from `/specs/006-qdrant-client-integration/`
 **Prerequisites**: plan.md (required), research.md, data-model.md, contracts/
 
 ## Execution Flow (main)

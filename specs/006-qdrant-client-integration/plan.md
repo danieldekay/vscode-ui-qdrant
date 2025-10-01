@@ -37,14 +37,14 @@ Integrate Qdrant JavaScript REST client into VS Code extension with connection m
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x with strict mode enabled  
-**Primary Dependencies**: @qdrant/js-client-rest, VS Code Extension API  
-**Storage**: Qdrant vector database (local file mode)  
-**Testing**: Mocha with contract tests, integration tests  
-**Target Platform**: VS Code extension (Node.js LTS 20.x+)  
-**Project Type**: Single project (VS Code extension)  
-**Performance Goals**: Support up to 1M vectors per collection, 10 concurrent searches  
-**Constraints**: Local Qdrant file mode only, OpenAI text-embedding-3-small (1536 dimensions)  
+**Language/Version**: TypeScript 5.x with strict mode enabled
+**Primary Dependencies**: @qdrant/js-client-rest, VS Code Extension API
+**Storage**: Qdrant vector database (local file mode)
+**Testing**: Mocha with contract tests, integration tests
+**Target Platform**: VS Code extension (Node.js LTS 20.x+)
+**Project Type**: Single project (VS Code extension)
+**Performance Goals**: Support up to 1M vectors per collection, 10 concurrent searches
+**Constraints**: Local Qdrant file mode only, OpenAI text-embedding-3-small (1536 dimensions)
 **Scale/Scope**: 1M vectors max, 1536-dimension embeddings, local file storage
 
 ## Constitution Check
@@ -241,8 +241,8 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 
 _These phases are beyond the scope of the /plan command_
 
-**Phase 3**: Task execution (/tasks command creates tasks.md)  
-**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 3**: Task execution (/tasks command creates tasks.md)
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)
 **Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking

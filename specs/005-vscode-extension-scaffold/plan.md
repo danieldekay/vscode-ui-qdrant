@@ -37,14 +37,14 @@ Complete VSCode extension scaffold with TypeScript 5.x, strict mode, VS Code Ext
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x with strict mode enabled  
-**Primary Dependencies**: @types/vscode, VS Code Extension API, Qdrant REST API (local mode only)  
-**Storage**: Local Qdrant instance (vector database)  
-**Testing**: Mocha for TDD, integration tests for Qdrant API interactions  
-**Target Platform**: VS Code extension (minimum version 1.74.0)  
-**Project Type**: Single VS Code extension project  
-**Performance Goals**: Best effort for vector search operations (no specific latency requirements)  
-**Constraints**: Local Qdrant mode only, no cloud/remote databases, VS Code extension API boundaries  
+**Language/Version**: TypeScript 5.x with strict mode enabled
+**Primary Dependencies**: @types/vscode, VS Code Extension API, Qdrant REST API (local mode only)
+**Storage**: Local Qdrant instance (vector database)
+**Testing**: Mocha for TDD, integration tests for Qdrant API interactions
+**Target Platform**: VS Code extension (minimum version 1.74.0)
+**Project Type**: Single VS Code extension project
+**Performance Goals**: Best effort for vector search operations (no specific latency requirements)
+**Constraints**: Local Qdrant mode only, no cloud/remote databases, VS Code extension API boundaries
 **Scale/Scope**: Single extension with vector search UI and collection management for local Qdrant
 
 ## Constitution Check
@@ -243,8 +243,8 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 
 _These phases are beyond the scope of the /plan command_
 
-**Phase 3**: Task execution (/tasks command creates tasks.md)  
-**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 3**: Task execution (/tasks command creates tasks.md)
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)
 **Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking

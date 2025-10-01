@@ -1,8 +1,8 @@
 # Feature Specification: Qdrant Client Integration
 
-**Feature Branch**: `006-qdrant-client-integration`  
-**Created**: October 1, 2025  
-**Status**: Draft  
+**Feature Branch**: `006-qdrant-client-integration`
+**Created**: October 1, 2025
+**Status**: Draft
 **Input**: User description: "# Spec: Qdrant Client Integration
 
 ## Objective
@@ -197,7 +197,7 @@ When creating this spec from a user prompt:
 3. **Think like a tester**: Every vague requirement should fail the "testable and unambiguous" checklist item
 4. **Common underspecified areas**:
    - User types and permissions
-   - Data retention/deletion policies  
+   - Data retention/deletion policies
    - Performance targets and scale
    - Error handling behaviors
    - Integration requirements
@@ -271,7 +271,7 @@ As a VS Code user working with vector databases, I want to connect to a Qdrant i
 
 ### Requirement Completeness
 - [ ] No [NEEDS CLARIFICATION] markers remain - [NEEDS CLARIFICATION: Implementation details need to be removed]
-- [ ] Requirements are testable and unambiguous  
+- [ ] Requirements are testable and unambiguous
 - [ ] Success criteria are measurable
 - [ ] Scope is clearly bounded
 - [ ] Dependencies and assumptions identified
