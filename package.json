@@ -1,0 +1,54 @@
+{
+    "name": "vscode-ui-qdrant",
+    "version": "0.1.0",
+    "description": "VS Code extension for Qdrant vector database UI",
+    "main": "./dist/extension.js",
+    "engines": {
+        "vscode": "^1.74.0",
+        "node": ">=20.0.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:vscode-ui-qdrant.helloWorld"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "vscode-ui-qdrant.helloWorld",
+                "title": "Hello World"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "validate-config": "node scripts/validate-tsconfig.js",
+        "pretest": "npm run validate-config && npm run lint && npm run compile",
+        "typecheck": "tsc --noEmit",
+        "lint": "biome check src tests",
+        "lint:fix": "biome check --write src tests",
+        "format": "biome format src tests",
+        "format:fix": "biome format --write src tests",
+        "dev": "tsc --watch",
+        "build": "tsc",
+        "check": "npm run typecheck && npm run lint",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "2.2.4",
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "20.x",
+        "@types/vscode": "^1.74.0",
+        "@typescript-eslint/eslint-plugin": "^5.42.0",
+        "@typescript-eslint/parser": "^5.42.0",
+        "eslint": "^8.28.0",
+        "glob": "^8.1.0",
+        "mocha": "^10.1.0",
+        "tsx": "^4.20.6",
+        "typescript": "^5.0.0"
+    }
+}
