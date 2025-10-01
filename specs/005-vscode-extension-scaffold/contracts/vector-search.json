@@ -1,0 +1,79 @@
+{
+  "contractId": "VEC-SEARCH-001",
+  "name": "Vector Search Contract",
+  "purpose": "Define vector similarity search behavior",
+  "status": "Draft",
+  "request": {
+    "type": "SearchRequest",
+    "properties": {
+      "collection": {
+        "type": "string",
+        "description": "Target collection name"
+      },
+      "vector": {
+        "type": "number[]",
+        "description": "Query vector"
+      },
+      "limit": {
+        "type": "number",
+        "default": 10,
+        "description": "Maximum results to return"
+      },
+      "scoreThreshold": {
+        "type": "number",
+        "optional": true,
+        "description": "Minimum similarity score"
+      },
+      "filter": {
+        "type": "object",
+        "optional": true,
+        "description": "Metadata filter conditions"
+      },
+      "withPayload": {
+        "type": "boolean",
+        "default": true,
+        "description": "Include document payload"
+      },
+      "withVectors": {
+        "type": "boolean",
+        "default": false,
+        "description": "Include vector data in results"
+      }
+    }
+  },
+  "response": {
+    "type": "SearchResponse",
+    "properties": {
+      "results": {
+        "type": "SearchResult[]",
+        "description": "Search results ordered by similarity"
+      },
+      "count": {
+        "type": "number",
+        "description": "Number of results returned"
+      },
+      "executionTime": {
+        "type": "number",
+        "description": "Search execution time in milliseconds"
+      }
+    }
+  },
+  "behavior": [
+    "Validates collection exists and is accessible",
+    "Performs vector similarity search using specified parameters",
+    "Returns results ordered by descending similarity score",
+    "Includes execution time for performance monitoring"
+  ],
+  "errorConditions": [
+    "Collection not found: Returns collection error",
+    "Invalid vector format: Returns validation error",
+    "Connection failure: Returns connection error"
+  ],
+  "testCases": [
+    "Successful search with valid parameters",
+    "Search with score threshold filtering",
+    "Search with metadata filters",
+    "Error handling for non-existent collection",
+    "Error handling for invalid vector format"
+  ]
+}

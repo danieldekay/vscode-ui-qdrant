@@ -2,7 +2,7 @@
     "name": "vscode-ui-qdrant",
     "version": "0.1.0",
     "description": "VS Code extension for Qdrant vector database UI",
-    "main": "./dist/extension.js",
+    "main": "./out/src/index.js",
     "engines": {
         "vscode": "^1.74.0",
         "node": ">=20.0.0"
@@ -11,15 +11,40 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:vscode-ui-qdrant.helloWorld"
+        "onCommand:qdrant.openSearch",
+        "onCommand:qdrant.openCollections",
+        "onCommand:qdrant.connect",
+        "onCommand:qdrant.disconnect"
     ],
     "contributes": {
         "commands": [
             {
-                "command": "vscode-ui-qdrant.helloWorld",
-                "title": "Hello World"
+                "command": "qdrant.openSearch",
+                "title": "Qdrant: Open Search"
+            },
+            {
+                "command": "qdrant.openCollections",
+                "title": "Qdrant: Open Collections"
+            },
+            {
+                "command": "qdrant.connect",
+                "title": "Qdrant: Connect"
+            },
+            {
+                "command": "qdrant.disconnect",
+                "title": "Qdrant: Disconnect"
             }
-        ]
+        ],
+        "views": {
+            "explorer": [
+                {
+                    "id": "qdrantCollections",
+                    "name": "Qdrant Collections",
+                    "icon": "$(database)",
+                    "contextualTitle": "Qdrant Collections"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

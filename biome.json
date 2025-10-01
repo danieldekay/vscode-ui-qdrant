@@ -17,6 +17,10 @@
       "style": {
         "useConst": "error",
         "noNegationElse": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noConfusingVoidType": "off"
       }
     }
   },

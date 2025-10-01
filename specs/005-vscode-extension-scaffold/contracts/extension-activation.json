@@ -1,0 +1,54 @@
+{
+  "contractId": "EXT-ACT-001",
+  "name": "Extension Activation Contract",
+  "purpose": "Define extension activation behavior and lifecycle",
+  "status": "Draft",
+  "request": {
+    "type": "ActivationRequest",
+    "properties": {
+      "context": {
+        "type": "vscode.ExtensionContext",
+        "description": "VS Code extension context"
+      },
+      "activationEvent": {
+        "type": "string",
+        "optional": true,
+        "description": "Event that triggered activation"
+      }
+    }
+  },
+  "response": {
+    "type": "ActivationResponse",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "description": "Whether activation succeeded"
+      },
+      "commands": {
+        "type": "string[]",
+        "description": "List of registered commands"
+      },
+      "error": {
+        "type": "string",
+        "optional": true,
+        "description": "Error message if activation failed"
+      }
+    }
+  },
+  "behavior": [
+    "Extension activates on command palette usage",
+    "Registers all Qdrant-related commands",
+    "Initializes connection configuration",
+    "Sets up UI components (status bar, tree views)"
+  ],
+  "errorConditions": [
+    "VS Code version below minimum: Activation fails gracefully",
+    "Missing dependencies: Partial activation with warnings"
+  ],
+  "testCases": [
+    "Extension activates on 'Qdrant: Open Search' command",
+    "All commands registered in command palette",
+    "Status bar item created on activation",
+    "Tree views initialized for collections"
+  ]
+}

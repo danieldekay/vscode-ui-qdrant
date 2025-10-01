@@ -1,0 +1,39 @@
+{
+  "contractId": "COLL-MGMT-001",
+  "name": "Collection Management Contract",
+  "purpose": "Define collection listing and information retrieval",
+  "status": "Draft",
+  "request": {
+    "type": "ListCollectionsRequest",
+    "properties": {}
+  },
+  "response": {
+    "type": "ListCollectionsResponse",
+    "properties": {
+      "collections": {
+        "type": "CollectionInfo[]",
+        "description": "List of available collections"
+      },
+      "count": {
+        "type": "number",
+        "description": "Number of collections found"
+      }
+    }
+  },
+  "behavior": [
+    "Retrieves list of all collections from Qdrant",
+    "Includes collection metadata (name, vector size, distance, status)",
+    "Returns collections sorted alphabetically",
+    "Provides real-time collection status information"
+  ],
+  "errorConditions": [
+    "Connection failure: Returns connection error",
+    "Permission denied: Returns authorization error"
+  ],
+  "testCases": [
+    "Successful collection listing",
+    "Empty collection list handling",
+    "Connection error during listing",
+    "Collection metadata accuracy"
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "contractId": "QDR-CONN-001",
+  "name": "Qdrant Connection Contract",
+  "purpose": "Define connection behavior to local Qdrant instance",
+  "status": "Draft",
+  "request": {
+    "type": "ConnectionRequest",
+    "properties": {
+      "host": {
+        "type": "string",
+        "default": "localhost",
+        "description": "Qdrant server host"
+      },
+      "port": {
+        "type": "number",
+        "default": 6333,
+        "description": "Qdrant server port"
+      },
+      "apiKey": {
+        "type": "string",
+        "optional": true,
+        "description": "Authentication key"
+      },
+      "timeout": {
+        "type": "number",
+        "default": 5000,
+        "description": "Connection timeout in milliseconds"
+      }
+    }
+  },
+  "response": {
+    "type": "ConnectionResponse",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "description": "Whether connection succeeded"
+      },
+      "version": {
+        "type": "string",
+        "optional": true,
+        "description": "Qdrant server version"
+      },
+      "error": {
+        "type": "string",
+        "optional": true,
+        "description": "Error message if connection failed"
+      }
+    }
+  },
+  "behavior": [
+    "Attempts connection to specified host:port",
+    "Validates Qdrant API availability",
+    "Returns connection status and server info",
+    "Handles network timeouts gracefully"
+  ],
+  "errorConditions": [
+    "Network unreachable: Returns connection error",
+    "Invalid credentials: Returns authentication error",
+    "Server not responding: Returns timeout error"
+  ],
+  "testCases": [
+    "Successful connection to local Qdrant instance",
+    "Connection failure with invalid host",
+    "Connection timeout handling",
+    "Authentication error handling"
+  ]
+}
