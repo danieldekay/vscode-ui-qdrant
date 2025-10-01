@@ -39,14 +39,14 @@ Configuration UX Link feature adds a prominent configuration access link to the 
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x with strict mode enabled  
-**Primary Dependencies**: @types/vscode, @qdrant/js-client-rest, VS Code Extension API  
-**Storage**: VS Code workspace settings, Qdrant database files  
-**Testing**: Mocha with VS Code extension test framework  
-**Target Platform**: VS Code extension host (desktop and web)  
-**Project Type**: VS Code extension  
-**Performance Goals**: UI operations <200ms, settings access <100ms  
-**Constraints**: Must work in restricted VS Code environments, no external network dependencies for core functionality  
+**Language/Version**: TypeScript 5.x with strict mode enabled
+**Primary Dependencies**: @types/vscode, @qdrant/js-client-rest, VS Code Extension API
+**Storage**: VS Code workspace settings, Qdrant database files
+**Testing**: Mocha with VS Code extension test framework
+**Target Platform**: VS Code extension host (desktop and web)
+**Project Type**: VS Code extension
+**Performance Goals**: UI operations <200ms, settings access <100ms
+**Constraints**: Must work in restricted VS Code environments, no external network dependencies for core functionality
 **Scale/Scope**: Single extension with tree view, settings integration, and error handling
 
 ## Constitution Check
@@ -287,8 +287,8 @@ The /tasks command will analyze Phase 1 artifacts and generate implementation ta
 
 _These phases are beyond the scope of the /plan command_
 
-**Phase 3**: Task execution (/tasks command creates tasks.md)  
-**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 3**: Task execution (/tasks command creates tasks.md)
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)
 **Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking

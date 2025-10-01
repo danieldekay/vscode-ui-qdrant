@@ -1,7 +1,7 @@
 # VSCode API Contracts: Configuration UX Link
 
-**Feature**: Configuration UX Link  
-**Date**: 2025-10-01  
+**Feature**: Configuration UX Link
+**Date**: 2025-10-01
 **Purpose**: Define VSCode API contracts for configuration access functionality
 
 ## Command Contracts

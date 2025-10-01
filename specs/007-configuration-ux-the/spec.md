@@ -1,8 +1,8 @@
 # Feature Specification: Configuration UX Link
 
-**Feature Branch**: `007-configuration-ux-the`  
-**Created**: 2025-10-01  
-**Status**: Draft  
+**Feature Branch**: `007-configuration-ux-the`
+**Created**: 2025-10-01
+**Status**: Draft
 **Input**: User description: "Configuration UX - the extension should, when no collections selected, have a link to the place where i can configure the relative path to the qdrant_db."
 
 ## Execution Flow (main)
@@ -44,7 +44,7 @@ When creating this spec from a user prompt:
 3. **Think like a tester**: Every vague requirement should fail the "testable and unambiguous" checklist item
 4. **Common underspecified areas**:
    - User types and permissions
-   - Data retention/deletion policies  
+   - Data retention/deletion policies
    - Performance targets and scale
    - Error handling behaviors
    - Integration requirements
@@ -100,7 +100,7 @@ As a VSCode user working with Qdrant databases, I want to easily access configur
 
 ### Requirement Completeness
 - [ ] No [NEEDS CLARIFICATION] markers remain
-- [ ] Requirements are testable and unambiguous  
+- [ ] Requirements are testable and unambiguous
 - [ ] Success criteria are measurable
 - [ ] Scope is clearly bounded
 - [ ] Dependencies and assumptions identified
