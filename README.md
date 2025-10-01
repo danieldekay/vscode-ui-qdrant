@@ -202,6 +202,76 @@ This TypeScript configuration follows the project constitution:
 - ✅ Source map generation for debugging
 - ✅ Automated quality checks
 
+## Available Scripts
+
+This project provides standardized npm scripts for development, building, and quality assurance.
+
+### Development Scripts
+
+```bash
+# Start development mode with TypeScript watch
+npm run dev
+
+# Run type checking without emitting files
+npm run typecheck
+
+# Run comprehensive validation (typecheck + lint)
+npm run check
+```
+
+### Code Quality Scripts
+
+```bash
+# Lint source code with Biome
+npm run lint
+
+# Format code with Biome
+npm run format
+```
+
+### Build & Test Scripts
+
+```bash
+# Compile TypeScript to JavaScript
+npm run build
+
+# Run full test suite
+npm test
+
+# Run pretest validation (config + lint + compile)
+npm run pretest
+```
+
+### Script Details
+
+| Script | Command | Purpose | Performance |
+|--------|---------|---------|-------------|
+| `dev` | `tsc --watch` | Development watch mode for continuous compilation | Continuous monitoring |
+| `typecheck` | `tsc --noEmit` | Type checking without file generation | ~0.7s |
+| `lint` | `biome check src tests` | Code quality checking with Biome | ~0.15s |
+| `format` | `biome format src tests` | Code formatting with Biome | ~0.15s |
+| `check` | `npm run typecheck && npm run lint` | Combined type and lint validation | ~1.1s |
+| `build` | `tsc` | Full TypeScript compilation to JavaScript | ~0.8s |
+| `test` | `node ./out/test/runTest.js` | Run complete test suite | Variable |
+| `pretest` | `npm run validate-config && npm run lint && npm run compile` | Pre-commit validation | ~2.0s |
+
+### Script-Based Development Workflow
+
+1. **Setup**: Clone repository and run `npm install`
+2. **Development**: Use `npm run dev` for continuous compilation
+3. **Quality**: Run `npm run check` to validate code quality
+4. **Build**: Run `npm run build` to create production build
+5. **Test**: Run `npm test` to execute full test suite
+
+### CI/CD Integration
+
+All scripts are designed for automated environments:
+
+- Scripts return proper exit codes (0 for success, non-zero for failure)
+- No interactive prompts or user input required
+- Consistent behavior across different environments
+- Fast execution suitable for CI pipelines
+
 ## Contributing
 
 1. Ensure all TypeScript files pass type checking
