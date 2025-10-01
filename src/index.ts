@@ -54,7 +54,7 @@ export function deactivate() {
 /**
  * Check if VS Code version is compatible
  */
-function isVersionCompatible(version: string): boolean {
+export function isVersionCompatible(version: string): boolean {
   const minVersion = '1.74.0';
   return version >= minVersion;
 }
