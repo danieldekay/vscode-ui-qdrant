@@ -1,8 +1,8 @@
 # Feature Specification: Qdrant UX Inside VSCode
 
-**Feature Branch**: `009-qdrant-ux-inside`  
-**Created**: 2025-10-01  
-**Status**: Draft  
+**Feature Branch**: `009-qdrant-ux-inside`
+**Created**: 2025-10-01
+**Status**: Draft
 **Input**: User description: "Qdrant ux inside vscode should implement open config command, search command, and provide a large window to search/display results/tune parameters while searching."
 
 ## Clarifications
@@ -53,7 +53,7 @@ When creating this spec from a user prompt:
 3. **Think like a tester**: Every vague requirement should fail the "testable and unambiguous" checklist item
 4. **Common underspecified areas**:
    - User types and permissions
-   - Data retention/deletion policies  
+   - Data retention/deletion policies
    - Performance targets and scale
    - Error handling behaviors
    - Integration requirements
@@ -115,7 +115,7 @@ As a VS Code user working with Qdrant vector databases, I want to have a compreh
 
 ### Requirement Completeness
 - [ ] No [NEEDS CLARIFICATION] markers remain
-- [ ] Requirements are testable and unambiguous  
+- [ ] Requirements are testable and unambiguous
 - [ ] Success criteria are measurable
 - [ ] Scope is clearly bounded
 - [ ] Dependencies and assumptions identified

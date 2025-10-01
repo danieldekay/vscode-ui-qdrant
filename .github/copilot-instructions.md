@@ -39,9 +39,9 @@ The project provides standardized npm scripts for development and quality assura
 TypeScript 5.x (latest stable) with Node.js LTS 20.x+ runtime: Follow standard conventions
 
 ## Recent Changes
+- 009-qdrant-ux-inside: Added TypeScript 5.x with strict mode enabled + @types/vscode, @qdrant/js-client-rest, VS Code Extension API
 - 008-local-db-file: Added TypeScript 5.x with strict mode enabled + @types/vscode (VS Code Extension API), @qdrant/js-client-rest (Qdrant client)
 - 007-configuration-ux-the: Added TypeScript 5.x with strict mode enabled + @types/vscode, @qdrant/js-client-rest, VS Code Extension API
-- 005-vscode-extension-scaffold: Added TypeScript 5.x with strict mode enabled + @types/vscode, VS Code Extension API, Qdrant REST API (local mode only)
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

@@ -21,6 +21,7 @@ import {
 /**
  * Service for validating Qdrant database files
  */
+// biome-ignore lint/complexity/noStaticOnlyClass: This is a utility class with static methods
 export class FileService {
   /**
    * Validates a Qdrant database file at the given path

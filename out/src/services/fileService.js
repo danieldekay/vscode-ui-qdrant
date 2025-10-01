@@ -42,6 +42,7 @@ const fileValidation_1 = require("../types/fileValidation");
 /**
  * Service for validating Qdrant database files
  */
+// biome-ignore lint/complexity/noStaticOnlyClass: This is a utility class with static methods
 class FileService {
     /**
      * Validates a Qdrant database file at the given path
