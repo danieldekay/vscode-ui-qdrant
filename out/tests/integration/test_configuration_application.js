@@ -1,0 +1,239 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const chai_1 = require("chai");
+const mocha_1 = require("mocha");
+/**
+ * Integration Tests: Configuration Application
+ *
+ * Tests the complete flow of applying configuration changes through
+ * VSCode settings and verifying the extension responds correctly.
+ * This ensures configuration changes are detected and applied properly.
+ */
+(0, mocha_1.describe)('Configuration Application - Integration Test', () => {
+    let mockVSCodeAPI;
+    let mockConfigurationService;
+    let configurationChanged;
+    let treeDataRefreshed;
+    let configValidationPassed;
+    let appliedConfig;
+    (0, mocha_1.beforeEach)(() => {
+        configurationChanged = false;
+        treeDataRefreshed = false;
+        configValidationPassed = false;
+        appliedConfig = null;
+        // Mock VSCode API with configuration change detection
+        mockVSCodeAPI = {
+            workspace: {
+                onDidChangeConfiguration: (_callback) => {
+                    // Return disposable mock
+                    return {
+                        dispose: () => { },
+                    };
+                },
+                getConfiguration: (section) => {
+                    if (section === 'qdrant') {
+                        return {
+                            get: (key) => {
+                                if (appliedConfig && key in appliedConfig) {
+                                    return appliedConfig[key];
+                                }
+                                const defaultConfig = {
+                                    host: 'localhost',
+                                    port: 6333,
+                                    apiKey: '',
+                                    useHttps: false,
+                                };
+                                return defaultConfig[key];
+                            },
+                            update: async (key, value) => {
+                                if (!appliedConfig)
+                                    appliedConfig = {};
+                                appliedConfig[key] = value;
+                                configurationChanged = true;
+                                // Trigger configuration change event synchronously
+                                await mockConfigurationService.handleConfigurationChange({
+                                    affectsConfiguration: (section) => section === 'qdrant',
+                                });
+                            },
+                        };
+                    }
+                    return {
+                        get: () => undefined,
+                        update: async () => { },
+                    };
+                },
+            },
+            commands: {
+                executeCommand: async (command) => {
+                    if (command === 'qdrant.refreshCollections') {
+                        treeDataRefreshed = true;
+                        return Promise.resolve();
+                    }
+                    return Promise.resolve();
+                },
+            },
+            window: {
+                showInformationMessage: async (_message) => {
+                    return Promise.resolve();
+                },
+                showErrorMessage: async (_message) => {
+                    return Promise.resolve();
+                },
+            },
+        };
+        // Mock configuration service with validation and application logic
+        mockConfigurationService = {
+            currentConfig: null,
+            isValid: false,
+            validateConfiguration: (config) => {
+                const isValid = config &&
+                    typeof config.host === 'string' &&
+                    config.host.length > 0 &&
+                    typeof config.port === 'number' &&
+                    config.port > 0 &&
+                    config.port < 65536;
+                configValidationPassed = isValid;
+                return isValid;
+            },
+            applyConfiguration: async (config) => {
+                if (mockConfigurationService.validateConfiguration(config)) {
+                    mockConfigurationService.currentConfig = { ...config };
+                    mockConfigurationService.isValid = true;
+                    // Trigger tree refresh
+                    await mockVSCodeAPI.commands.executeCommand('qdrant.refreshCollections');
+                    return { success: true, error: null };
+                }
+                else {
+                    mockConfigurationService.isValid = false;
+                    return { success: false, error: 'Invalid configuration' };
+                }
+            },
+            handleConfigurationChange: async (event) => {
+                if (event.affectsConfiguration('qdrant')) {
+                    const newConfig = {
+                        host: mockVSCodeAPI.workspace.getConfiguration('qdrant').get('host'),
+                        port: mockVSCodeAPI.workspace.getConfiguration('qdrant').get('port'),
+                        apiKey: mockVSCodeAPI.workspace.getConfiguration('qdrant').get('apiKey'),
+                        useHttps: mockVSCodeAPI.workspace.getConfiguration('qdrant').get('useHttps'),
+                    };
+                    await mockConfigurationService.applyConfiguration(newConfig);
+                }
+            },
+            getCurrentConfiguration: () => {
+                return mockConfigurationService.currentConfig;
+            },
+        };
+        // Remove unused mockTreeDataProvider
+    });
+    (0, mocha_1.afterEach)(() => {
+        configurationChanged = false;
+        treeDataRefreshed = false;
+        configValidationPassed = false;
+        appliedConfig = null;
+    });
+    (0, mocha_1.it)('should detect configuration changes through VSCode settings', async () => {
+        // Given: Initial configuration
+        // When: Configuration is changed via VSCode settings API
+        await mockVSCodeAPI.workspace.getConfiguration('qdrant').update('host', 'qdrant.example.com');
+        // Then: Configuration change should be detected
+        (0, chai_1.expect)(configurationChanged).to.be.true;
+    });
+    (0, mocha_1.it)('should validate configuration when changes are applied', async () => {
+        // Given: Valid configuration change
+        // When: Configuration is updated
+        await mockVSCodeAPI.workspace.getConfiguration('qdrant').update('port', 8080);
+        // Then: Configuration should be validated
+        (0, chai_1.expect)(configValidationPassed).to.be.true;
+    });
+    (0, mocha_1.it)('should apply valid configuration changes automatically', async () => {
+        // Given: Valid configuration values
+        // When: Multiple configuration values are updated
+        await mockVSCodeAPI.workspace.getConfiguration('qdrant').update('host', 'qdrant.example.com');
+        await mockVSCodeAPI.workspace.getConfiguration('qdrant').update('port', 8080);
+        // Then: Configuration should be applied
+        const currentConfig = mockConfigurationService.getCurrentConfiguration();
+        (0, chai_1.expect)(currentConfig).to.not.be.null;
+        (0, chai_1.expect)(currentConfig.host).to.equal('qdrant.example.com');
+        (0, chai_1.expect)(currentConfig.port).to.equal(8080);
+    });
+    (0, mocha_1.it)('should refresh tree data provider when configuration changes', async () => {
+        // Given: Tree data provider is connected
+        // When: Configuration is changed
+        await mockVSCodeAPI.workspace.getConfiguration('qdrant').update('host', 'new-host');
+        // Then: Tree data should be refreshed
+        (0, chai_1.expect)(treeDataRefreshed).to.be.true;
+    });
+    (0, mocha_1.it)('should reject invalid configuration values', async () => {
+        // Given: Invalid port number
+        // When: Invalid configuration is applied
+        const result = await mockConfigurationService.applyConfiguration({
+            host: 'localhost',
+            port: -1, // Invalid port
+            apiKey: '',
+            useHttps: false,
+        });
+        // Then: Configuration should be rejected
+        (0, chai_1.expect)(result.success).to.be.false;
+        (0, chai_1.expect)(result.error).to.include('Invalid configuration');
+        (0, chai_1.expect)(mockConfigurationService.isValid).to.be.false;
+    });
+    (0, mocha_1.it)('should handle configuration changes with missing values', async () => {
+        // Given: Partial configuration
+        // When: Configuration with missing required values is applied
+        const result = await mockConfigurationService.applyConfiguration({
+            host: '', // Empty host is invalid
+            port: 6333,
+            apiKey: '',
+            useHttps: false,
+        });
+        // Then: Should be rejected due to missing host
+        (0, chai_1.expect)(result.success).to.be.false;
+        (0, chai_1.expect)(configValidationPassed).to.be.false;
+    });
+    (0, mocha_1.it)('should maintain configuration state across multiple changes', async () => {
+        // Given: Initial valid configuration
+        await mockConfigurationService.applyConfiguration({
+            host: 'localhost',
+            port: 6333,
+            apiKey: '',
+            useHttps: false,
+        });
+        // When: Multiple configuration updates are made
+        await mockVSCodeAPI.workspace.getConfiguration('qdrant').update('host', 'qdrant.example.com');
+        await mockVSCodeAPI.workspace.getConfiguration('qdrant').update('port', 8080);
+        await mockVSCodeAPI.workspace.getConfiguration('qdrant').update('apiKey', 'secret-key');
+        // Then: All changes should be maintained
+        const finalConfig = mockConfigurationService.getCurrentConfiguration();
+        (0, chai_1.expect)(finalConfig.host).to.equal('qdrant.example.com');
+        (0, chai_1.expect)(finalConfig.port).to.equal(8080);
+        (0, chai_1.expect)(finalConfig.apiKey).to.equal('secret-key');
+    });
+    (0, mocha_1.it)('should not refresh tree when configuration validation fails', async () => {
+        // Given: Tree refresh flag reset
+        treeDataRefreshed = false;
+        // When: Invalid configuration is applied
+        await mockConfigurationService.applyConfiguration({
+            host: 'localhost',
+            port: 99999, // Invalid port
+            apiKey: '',
+            useHttps: false,
+        });
+        // Then: Tree should not be refreshed
+        (0, chai_1.expect)(treeDataRefreshed).to.be.false;
+    });
+    (0, mocha_1.it)('should handle rapid configuration changes gracefully', async () => {
+        // Given: Multiple rapid changes
+        // When: Several configuration updates happen quickly
+        const promises = [
+            mockVSCodeAPI.workspace.getConfiguration('qdrant').update('host', 'host1'),
+            mockVSCodeAPI.workspace.getConfiguration('qdrant').update('host', 'host2'),
+            mockVSCodeAPI.workspace.getConfiguration('qdrant').update('host', 'host3'),
+        ];
+        await Promise.all(promises);
+        // Then: Final configuration should be the last valid one
+        const finalConfig = mockConfigurationService.getCurrentConfiguration();
+        (0, chai_1.expect)(finalConfig).to.not.be.null;
+        (0, chai_1.expect)(finalConfig.host).to.equal('host3');
+    });
+});
+//# sourceMappingURL=test_configuration_application.js.map

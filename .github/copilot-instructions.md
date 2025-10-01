@@ -9,6 +9,10 @@ Auto-generated from all feature plans. Last updated: 2025-10-01
 - TypeScript 5.x + VS Code Extension API, Biome linting/formatting tool (003-package-scripts-required)
 - TypeScript 5.x with strict mode enabled + @types/vscode, VS Code Extension API, Qdrant REST API (local mode only) (005-vscode-extension-scaffold)
 - Local Qdrant instance (vector database) (005-vscode-extension-scaffold)
+- TypeScript 5.x with strict mode enabled + @types/vscode, @qdrant/js-client-rest, VS Code Extension API (007-configuration-ux-the)
+- VS Code workspace settings, Qdrant database files (007-configuration-ux-the)
+- TypeScript 5.x with strict mode enabled + @types/vscode (VS Code Extension API), @qdrant/js-client-rest (Qdrant client) (008-local-db-file)
+- Local file system (Qdrant database files) (008-local-db-file)
 
 ## Project Structure
 ```
@@ -35,9 +39,9 @@ The project provides standardized npm scripts for development and quality assura
 TypeScript 5.x (latest stable) with Node.js LTS 20.x+ runtime: Follow standard conventions
 
 ## Recent Changes
+- 008-local-db-file: Added TypeScript 5.x with strict mode enabled + @types/vscode (VS Code Extension API), @qdrant/js-client-rest (Qdrant client)
+- 007-configuration-ux-the: Added TypeScript 5.x with strict mode enabled + @types/vscode, @qdrant/js-client-rest, VS Code Extension API
 - 005-vscode-extension-scaffold: Added TypeScript 5.x with strict mode enabled + @types/vscode, VS Code Extension API, Qdrant REST API (local mode only)
-- 003-package-scripts-required: Added TypeScript 5.x + VS Code Extension API, Biome linting/formatting tool
-- 002-linting-and-formatting: Added TypeScript 5.x (latest stable) with Node.js LTS 20.x+ runtime + Linting/formatting tool (Biome OR ESLint + Prettier), VS Code extension API, existing TypeScript compiler integration
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

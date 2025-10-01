@@ -4,6 +4,7 @@
     {
       "type": "npm",
       "script": "watch",
+      "label": "watch",
       "group": "build",
       "presentation": {
         "panel": "shared",

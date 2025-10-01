@@ -1,4 +1,6 @@
+import * as vscode from 'vscode';
 import type { CollectionConfig, CollectionInfo, ConnectionStatus, QdrantConfig, SearchRequest, SearchResult, VectorData } from '../types/qdrant';
+import type { ConfigUpdateResult } from '../types/qdrantConfig';
 /**
  * Service interface for Qdrant vector database operations
  */
@@ -81,5 +83,11 @@ export declare class QdrantService implements IQdrantService {
      * Health check
      */
     healthCheck(): Promise<boolean>;
+    /**
+     * Update the local database file path configuration
+     * @param fileUri - URI pointing to the new Qdrant database file
+     * @returns Promise resolving to configuration update result
+     */
+    static updateLocalDbPath(fileUri: vscode.Uri): Promise<ConfigUpdateResult>;
 }
 //# sourceMappingURL=qdrant-service.d.ts.map

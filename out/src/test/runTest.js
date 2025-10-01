@@ -43,13 +43,13 @@ const mocha_1 = __importDefault(require("mocha"));
 function run() {
     // Create the mocha test
     const mocha = new mocha_1.default({
-        ui: 'tdd',
+        ui: 'bdd',
         color: true,
         timeout: 10000,
     });
-    const testsRoot = path.resolve(__dirname, '..');
+    const testsRoot = path.resolve(__dirname, '../..');
     return new Promise((resolve, reject) => {
-        (0, glob_1.glob)('**/*.test.js', { cwd: testsRoot }, (err, files) => {
+        (0, glob_1.glob)('tests/**/*.js', { cwd: testsRoot }, (err, files) => {
             if (err) {
                 return reject(err);
             }

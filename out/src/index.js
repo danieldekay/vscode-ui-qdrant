@@ -37,6 +37,7 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 exports.isVersionCompatible = isVersionCompatible;
 const vscode = __importStar(require("vscode"));
+const selectDbFile_1 = require("./commands/selectDbFile");
 const qdrant_service_1 = require("./services/qdrant-service");
 const errors_1 = require("./types/errors");
 /**
@@ -141,7 +142,24 @@ function deactivate() {
  */
 function isVersionCompatible(version) {
     const minVersion = '1.74.0';
-    return version >= minVersion;
+    // Parse version strings into arrays of numbers
+    const parseVersion = (v) => {
+        return v.split('.').map(Number);
+    };
+    const current = parseVersion(version);
+    const minimum = parseVersion(minVersion);
+    // Compare version components
+    for (let i = 0; i < Math.max(current.length, minimum.length); i++) {
+        const currentPart = current[i] || 0;
+        const minimumPart = minimum[i] || 0;
+        if (currentPart > minimumPart) {
+            return true;
+        }
+        if (currentPart < minimumPart) {
+            return false;
+        }
+    }
+    return true; // versions are equal
 }
 /**
  * Check for required and optional dependencies
@@ -177,6 +195,8 @@ function registerCommands(context) {
             handleQdrantError(error, 'connection');
         }
     });
+    // Register Qdrant: Select Local Database File command
+    const selectLocalDbFileCommand = vscode.commands.registerCommand('qdrant.selectLocalDbFile', selectDbFile_1.selectLocalDbFile);
     // Register Qdrant: Disconnect command
     const disconnectCommand = vscode.commands.registerCommand('qdrant.disconnect', async () => {
         try {
@@ -190,7 +210,7 @@ function registerCommands(context) {
         }
     });
     // Add all commands to subscriptions
-    context.subscriptions.push(openSearchCommand, openCollectionsCommand, connectCommand, disconnectCommand);
+    context.subscriptions.push(openSearchCommand, openCollectionsCommand, connectCommand, selectLocalDbFileCommand, disconnectCommand);
 }
 /**
  * Create status bar item for Qdrant
@@ -204,25 +224,15 @@ function createStatusBarItem(context) {
     context.subscriptions.push(statusBarItem);
 }
 /**
- * Initialize tree views for Qdrant collections
- */
-function initializeTreeViews(context) {
-    // Create tree data provider for collections
-    const collectionsProvider = new QdrantCollectionsProvider();
-    // Register the tree view
-    const collectionsView = vscode.window.registerTreeDataProvider('qdrantCollections', collectionsProvider);
-    // Register refresh command for the tree view
-    const refreshCommand = vscode.commands.registerCommand('qdrantCollections.refresh', () => {
-        collectionsProvider.refresh();
-    });
-    context.subscriptions.push(collectionsView, refreshCommand);
-}
-/**
  * Tree data provider for Qdrant collections
  */
 class QdrantCollectionsProvider {
+    qdrantService;
     _onDidChangeTreeData = new vscode.EventEmitter();
     onDidChangeTreeData = this._onDidChangeTreeData.event;
+    constructor(qdrantService) {
+        this.qdrantService = qdrantService;
+    }
     refresh() {
         this._onDidChangeTreeData.fire();
     }
@@ -233,17 +243,22 @@ class QdrantCollectionsProvider {
         if (!element) {
             // Root level - return collections
             try {
-                if (qdrantService.isConnected()) {
-                    const collections = await qdrantService.listCollections();
+                console.log('QdrantCollectionsProvider: getChildren called, qdrantService exists:', !!this.qdrantService);
+                if (this.qdrantService?.isConnected()) {
+                    console.log('QdrantCollectionsProvider: Service is connected, listing collections');
+                    const collections = await this.qdrantService.listCollections();
+                    console.log('QdrantCollectionsProvider: Found collections:', collections);
                     return collections.map((name) => new QdrantCollectionItem(name, `Collection: ${name}`, vscode.TreeItemCollapsibleState.None));
                 }
                 else {
+                    console.log('QdrantCollectionsProvider: Service not connected');
                     return [
                         new QdrantCollectionItem('Not connected', 'Use "Qdrant: Connect" to connect to a server', vscode.TreeItemCollapsibleState.None),
                     ];
                 }
             }
             catch (error) {
+                console.error('QdrantCollectionsProvider: Error loading collections:', error);
                 return [
                     new QdrantCollectionItem('Connection error', `Failed to load collections: ${error instanceof Error ? error.message : 'Unknown error'}`, vscode.TreeItemCollapsibleState.None),
                 ];
@@ -266,5 +281,25 @@ class QdrantCollectionItem extends vscode.TreeItem {
         this.collapsibleState = collapsibleState;
         this.tooltip = tooltip;
     }
+}
+/**
+ * Initialize tree views for Qdrant collections
+ */
+function initializeTreeViews(context) {
+    console.log('Qdrant: Initializing tree views');
+    // Create tree data provider for collections
+    const collectionsProvider = new QdrantCollectionsProvider(qdrantService);
+    console.log('Qdrant: Created collections provider');
+    // Register the tree view
+    const collectionsView = vscode.window.registerTreeDataProvider('qdrantCollections', collectionsProvider);
+    console.log('Qdrant: Registered tree data provider');
+    // Register refresh command for the tree view
+    const refreshCommand = vscode.commands.registerCommand('qdrantCollections.refresh', () => {
+        console.log('Qdrant: Refresh command called');
+        collectionsProvider.refresh();
+    });
+    console.log('Qdrant: Registered refresh command');
+    context.subscriptions.push(collectionsView, refreshCommand);
+    console.log('Qdrant: Tree views initialized successfully');
 }
 //# sourceMappingURL=index.js.map

@@ -1,4 +1,5 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
+import * as vscode from 'vscode';
 import {
   QdrantCollectionNotFoundError,
   QdrantConnectionError,
@@ -14,6 +15,12 @@ import type {
   SearchResult,
   VectorData,
 } from '../types/qdrant';
+import type { ConfigUpdateResult } from '../types/qdrantConfig';
+import {
+  type ConnectionError,
+  ConnectionErrorCode,
+  ConnectionStatus as LocalConnectionStatus,
+} from '../types/qdrantConfig';
 import { validateCollectionName } from '../validation/collection';
 import { validateVector, validateVectors } from '../validation/vector';
 
@@ -374,6 +381,86 @@ export class QdrantService implements IQdrantService {
     } catch (error) {
       this.lastError = error instanceof Error ? error : new Error(String(error));
       return false;
+    }
+  }
+
+  /**
+   * Update the local database file path configuration
+   * @param fileUri - URI pointing to the new Qdrant database file
+   * @returns Promise resolving to configuration update result
+   */
+  static async updateLocalDbPath(fileUri: vscode.Uri): Promise<ConfigUpdateResult> {
+    try {
+      // Get current configuration
+      const config = vscode.workspace.getConfiguration('qdrant');
+      const previousPath = config.get<vscode.Uri | undefined>('localDbPath');
+
+      // Store the previous config for rollback if needed
+      const previousConfig = {
+        localDbPath: previousPath,
+        connectionStatus: previousPath
+          ? LocalConnectionStatus.CONNECTED
+          : LocalConnectionStatus.DISCONNECTED,
+      };
+
+      // Update configuration with new path
+      await config.update('localDbPath', fileUri, vscode.ConfigurationTarget.Workspace);
+
+      // Simulate connection attempt (in real implementation, this would start/connect to local Qdrant server)
+      // For now, we'll assume the connection succeeds if the file path is valid
+      let connectionStatus: LocalConnectionStatus;
+      let connectionError: ConnectionError | undefined;
+
+      try {
+        // Basic validation that file exists and is accessible
+        await vscode.workspace.fs.stat(fileUri);
+        connectionStatus = LocalConnectionStatus.CONNECTED;
+      } catch (error) {
+        connectionStatus = LocalConnectionStatus.ERROR;
+        connectionError = {
+          code: ConnectionErrorCode.FILE_NOT_FOUND,
+          message: 'Failed to access database file',
+          details: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: Date.now(),
+          recoverable: true,
+          recoveryAction: 'Check file permissions and path',
+        };
+      }
+
+      const newConfig = {
+        localDbPath: fileUri,
+        connectionStatus,
+        connectionError,
+        lastConnectedAt:
+          connectionStatus === LocalConnectionStatus.CONNECTED ? Date.now() : undefined,
+      };
+
+      return {
+        success: connectionStatus === LocalConnectionStatus.CONNECTED,
+        newConfig,
+        previousConfig: previousConfig.localDbPath ? previousConfig : undefined,
+        updatedAt: Date.now(),
+      };
+    } catch (error) {
+      // Configuration update failed
+      const connectionError: ConnectionError = {
+        code: ConnectionErrorCode.UNKNOWN_ERROR,
+        message: 'Failed to update configuration',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: Date.now(),
+        recoverable: true,
+        recoveryAction: 'Try again or check VS Code settings',
+      };
+
+      return {
+        success: false,
+        newConfig: {
+          connectionStatus: LocalConnectionStatus.ERROR,
+          connectionError,
+        },
+        error: connectionError,
+        updatedAt: Date.now(),
+      };
     }
   }
 }

@@ -1,8 +1,43 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QdrantService = void 0;
 const js_client_rest_1 = require("@qdrant/js-client-rest");
+const vscode = __importStar(require("vscode"));
 const errors_1 = require("../types/errors");
+const qdrantConfig_1 = require("../types/qdrantConfig");
 const collection_1 = require("../validation/collection");
 const vector_1 = require("../validation/vector");
 /**
@@ -301,6 +336,79 @@ class QdrantService {
         catch (error) {
             this.lastError = error instanceof Error ? error : new Error(String(error));
             return false;
+        }
+    }
+    /**
+     * Update the local database file path configuration
+     * @param fileUri - URI pointing to the new Qdrant database file
+     * @returns Promise resolving to configuration update result
+     */
+    static async updateLocalDbPath(fileUri) {
+        try {
+            // Get current configuration
+            const config = vscode.workspace.getConfiguration('qdrant');
+            const previousPath = config.get('localDbPath');
+            // Store the previous config for rollback if needed
+            const previousConfig = {
+                localDbPath: previousPath,
+                connectionStatus: previousPath
+                    ? qdrantConfig_1.ConnectionStatus.CONNECTED
+                    : qdrantConfig_1.ConnectionStatus.DISCONNECTED,
+            };
+            // Update configuration with new path
+            await config.update('localDbPath', fileUri, vscode.ConfigurationTarget.Workspace);
+            // Simulate connection attempt (in real implementation, this would start/connect to local Qdrant server)
+            // For now, we'll assume the connection succeeds if the file path is valid
+            let connectionStatus;
+            let connectionError;
+            try {
+                // Basic validation that file exists and is accessible
+                await vscode.workspace.fs.stat(fileUri);
+                connectionStatus = qdrantConfig_1.ConnectionStatus.CONNECTED;
+            }
+            catch (error) {
+                connectionStatus = qdrantConfig_1.ConnectionStatus.ERROR;
+                connectionError = {
+                    code: qdrantConfig_1.ConnectionErrorCode.FILE_NOT_FOUND,
+                    message: 'Failed to access database file',
+                    details: error instanceof Error ? error.message : 'Unknown error',
+                    timestamp: Date.now(),
+                    recoverable: true,
+                    recoveryAction: 'Check file permissions and path',
+                };
+            }
+            const newConfig = {
+                localDbPath: fileUri,
+                connectionStatus,
+                connectionError,
+                lastConnectedAt: connectionStatus === qdrantConfig_1.ConnectionStatus.CONNECTED ? Date.now() : undefined,
+            };
+            return {
+                success: connectionStatus === qdrantConfig_1.ConnectionStatus.CONNECTED,
+                newConfig,
+                previousConfig: previousConfig.localDbPath ? previousConfig : undefined,
+                updatedAt: Date.now(),
+            };
+        }
+        catch (error) {
+            // Configuration update failed
+            const connectionError = {
+                code: qdrantConfig_1.ConnectionErrorCode.UNKNOWN_ERROR,
+                message: 'Failed to update configuration',
+                details: error instanceof Error ? error.message : 'Unknown error',
+                timestamp: Date.now(),
+                recoverable: true,
+                recoveryAction: 'Try again or check VS Code settings',
+            };
+            return {
+                success: false,
+                newConfig: {
+                    connectionStatus: qdrantConfig_1.ConnectionStatus.ERROR,
+                    connectionError,
+                },
+                error: connectionError,
+                updatedAt: Date.now(),
+            };
         }
     }
 }

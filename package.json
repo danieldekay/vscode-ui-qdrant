@@ -1,10 +1,11 @@
 {
     "name": "vscode-ui-qdrant",
     "version": "0.1.0",
+    "publisher": "danieldekay",
     "description": "VS Code extension for Qdrant vector database UI",
     "main": "./out/src/index.js",
     "engines": {
-        "vscode": "^1.74.0",
+        "vscode": ">=1.80.0",
         "node": ">=20.0.0"
     },
     "categories": [
@@ -14,7 +15,10 @@
         "onCommand:qdrant.openSearch",
         "onCommand:qdrant.openCollections",
         "onCommand:qdrant.connect",
-        "onCommand:qdrant.disconnect"
+        "onCommand:qdrant.disconnect",
+        "onCommand:qdrant.openConfig",
+        "onCommand:qdrant.selectLocalDbFile",
+        "onView:qdrantCollections"
     ],
     "contributes": {
         "commands": [
@@ -33,6 +37,10 @@
             {
                 "command": "qdrant.disconnect",
                 "title": "Qdrant: Disconnect"
+            },
+            {
+                "command": "qdrant.openConfig",
+                "title": "Qdrant: Open Configuration"
             }
         ],
         "views": {
@@ -40,7 +48,6 @@
                 {
                     "id": "qdrantCollections",
                     "name": "Qdrant Collections",
-                    "icon": "$(database)",
                     "contextualTitle": "Qdrant Collections"
                 }
             ]
@@ -67,7 +74,11 @@
                 },
                 "qdrant.collection.default.distance": {
                     "type": "string",
-                    "enum": ["Cosine", "Euclid", "Dot"],
+                    "enum": [
+                        "Cosine",
+                        "Euclid",
+                        "Dot"
+                    ],
                     "default": "Cosine",
                     "enumDescriptions": [
                         "Cosine similarity - best for semantic search",
@@ -120,9 +131,9 @@
                 },
                 "qdrant.search.default.scoreThreshold": {
                     "type": "number",
-                    "default": 0.0,
-                    "minimum": 0.0,
-                    "maximum": 1.0,
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 1,
                     "description": "Default similarity score threshold (0.0 = no threshold)"
                 },
                 "qdrant.search.default.withPayload": {
@@ -169,7 +180,7 @@
         "dev": "tsc --watch",
         "build": "tsc",
         "check": "npm run typecheck && npm run lint",
-        "test": "node -e \"require('./out/test/runTest.js').run().catch(err => { console.error('Tests failed:', err); process.exit(1); })\""
+        "test": "node -e \"require('./out/src/test/runTest.js').run().catch(err => { console.error('Tests failed:', err); process.exit(1); })\""
     },
     "mocha": {
         "spec": "out/tests/**/*.test.js",
@@ -186,6 +197,7 @@
         "@types/glob": "^8.1.0",
         "@types/mocha": "^10.0.1",
         "@types/node": "20.x",
+        "@types/sinon": "^17.0.4",
         "@types/vscode": "^1.74.0",
         "@typescript-eslint/eslint-plugin": "^5.42.0",
         "@typescript-eslint/parser": "^5.42.0",
@@ -193,6 +205,7 @@
         "eslint": "^8.28.0",
         "glob": "^8.1.0",
         "mocha": "^10.1.0",
+        "sinon": "^21.0.0",
         "tsx": "^4.20.6",
         "typescript": "^5.0.0"
     },
