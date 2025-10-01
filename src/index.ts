@@ -1,19 +1,89 @@
 import * as vscode from 'vscode';
-import { QdrantClient } from './qdrant/client';
+import { type IQdrantService, QdrantService } from './services/qdrant-service';
+import {
+  QdrantAuthenticationError,
+  QdrantCollectionError,
+  QdrantConnectionError,
+  QdrantError,
+  QdrantValidationError,
+} from './types/errors';
 
 /**
- * Global Qdrant client instance
+ * Global Qdrant service instance
  */
-let qdrantClient: QdrantClient;
+let qdrantService: IQdrantService;
+
+/**
+ * Connect to Qdrant using VS Code configuration
+ */
+async function connectToQdrant(): Promise<void> {
+  const config = vscode.workspace.getConfiguration('qdrant');
+
+  const qdrantConfig = {
+    url: config.get('connection.url', 'file:///tmp/qdrant.db'),
+    apiKey: config.get('connection.apiKey', ''),
+    timeout: config.get('connection.timeout', 30000),
+  };
+
+  await qdrantService.connect(qdrantConfig);
+}
+
+/**
+ * Handle errors and show appropriate VS Code notifications
+ */
+function handleQdrantError(error: unknown, operation: string): void {
+  if (error instanceof QdrantConnectionError) {
+    vscode.window
+      .showErrorMessage(`Qdrant Connection Failed: ${error.message}`, 'Retry Connection')
+      .then((selection) => {
+        if (selection === 'Retry Connection') {
+          vscode.commands.executeCommand('qdrant.connect');
+        }
+      });
+  } else if (error instanceof QdrantAuthenticationError) {
+    vscode.window
+      .showErrorMessage(`Qdrant Authentication Failed: ${error.message}`, 'Update API Key')
+      .then((selection) => {
+        if (selection === 'Update API Key') {
+          vscode.commands.executeCommand(
+            'workbench.action.openSettings',
+            'qdrant.connection.apiKey',
+          );
+        }
+      });
+  } else if (error instanceof QdrantValidationError) {
+    vscode.window.showWarningMessage(`Qdrant Validation Error: ${error.message}`);
+  } else if (error instanceof QdrantCollectionError) {
+    vscode.window.showErrorMessage(`Qdrant Collection Error: ${error.message}`);
+  } else if (error instanceof QdrantError) {
+    vscode.window.showErrorMessage(`Qdrant Error: ${error.message}`);
+  } else {
+    vscode.window.showErrorMessage(
+      `Unexpected error during ${operation}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+  }
+}
 
 /**
  * Activates the VSCode UI Qdrant extension
  */
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log('VSCode UI Qdrant extension is now active!');
 
-  // Initialize Qdrant client
-  qdrantClient = new QdrantClient();
+  // Initialize Qdrant service
+  qdrantService = new QdrantService();
+
+  // Auto-connect if configured
+  const autoConnect = vscode.workspace.getConfiguration('qdrant').get('ui.autoConnect', false);
+  if (autoConnect) {
+    try {
+      await connectToQdrant();
+    } catch (error) {
+      // Auto-connect failed, but don't prevent extension activation
+      console.warn('Auto-connect failed:', error);
+      // Don't show error notification for auto-connect failures to avoid spam
+    }
+  }
 
   // Check VS Code version compatibility
   const vscodeVersion = vscode.version;
@@ -89,48 +159,26 @@ function registerCommands(context: vscode.ExtensionContext) {
   // Register Qdrant: Connect command
   const connectCommand = vscode.commands.registerCommand('qdrant.connect', async () => {
     try {
-      // Get connection configuration from user
-      const url = await vscode.window.showInputBox({
-        prompt: 'Enter Qdrant server URL',
-        placeHolder: 'http://localhost:6333',
-        value: 'http://localhost:6333',
-      });
-
-      if (!url) {
-        return;
-      }
-
-      const apiKey = await vscode.window.showInputBox({
-        prompt: 'Enter API key (optional)',
-        placeHolder: 'Leave empty if not required',
-      });
-
-      // Connect to Qdrant
-      await qdrantClient.connect({ url, apiKey });
-
-      vscode.window.showInformationMessage('Successfully connected to Qdrant server');
+      await connectToQdrant();
+      vscode.window.showInformationMessage('Successfully connected to Qdrant');
 
       // Refresh tree view to show collections
       vscode.commands.executeCommand('qdrantCollections.refresh');
     } catch (error) {
-      vscode.window.showErrorMessage(
-        `Failed to connect to Qdrant: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
+      handleQdrantError(error, 'connection');
     }
   });
 
   // Register Qdrant: Disconnect command
   const disconnectCommand = vscode.commands.registerCommand('qdrant.disconnect', async () => {
     try {
-      await qdrantClient.disconnect();
-      vscode.window.showInformationMessage('Disconnected from Qdrant server');
+      await qdrantService.disconnect();
+      vscode.window.showInformationMessage('Disconnected from Qdrant');
 
       // Refresh tree view
       vscode.commands.executeCommand('qdrantCollections.refresh');
     } catch (error) {
-      vscode.window.showErrorMessage(
-        `Failed to disconnect: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
+      handleQdrantError(error, 'disconnection');
     }
   });
 
@@ -199,10 +247,10 @@ class QdrantCollectionsProvider implements vscode.TreeDataProvider<QdrantCollect
     if (!element) {
       // Root level - return collections
       try {
-        if (qdrantClient.isConnected()) {
-          const collections = await qdrantClient.listCollections();
+        if (qdrantService.isConnected()) {
+          const collections = await qdrantService.listCollections();
           return collections.map(
-            (name) =>
+            (name: string) =>
               new QdrantCollectionItem(
                 name,
                 `Collection: ${name}`,

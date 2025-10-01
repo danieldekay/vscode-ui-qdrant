@@ -15,6 +15,7 @@
         "noUnusedImports": "error"
       },
       "style": {
+        "noNonNullAssertion": "off",
         "useConst": "error",
         "noNegationElse": "warn"
       },

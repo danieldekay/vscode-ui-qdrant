@@ -1,8 +1,402 @@
 # VSCode UI Qdrant
 
-A VS Code extension for intuit# Run validation and compilation (pretest)
-npm run pretest
+A comprehensive VS Code extension for Qdrant vector database management, exploration, and integration. Built with TypeScript 5.x, this extension provides a seamless interface for working with vector databases in your development workflow.
+
+## Features
+
+### 🔍 **Vector Database Management**
+- **Connection Management**: Connect to local Qdrant instances or remote servers
+- **Collection Operations**: Create, list, delete, and manage vector collections
+- **Vector Search**: Perform similarity searches with configurable parameters
+- **Data Import/Export**: Upsert and delete vectors with payload support
+
+### ⚙️ **VS Code Integration**
+- **Configuration UI**: Comprehensive settings panel for connection and search parameters
+- **Command Palette**: Quick access to all Qdrant operations
+- **Tree View**: Visual exploration of collections and vectors
+- **Status Bar**: Real-time connection status and health indicators
+
+### 🛡️ **Enterprise-Ready**
+- **Error Handling**: Context-aware error messages with recovery actions
+- **Validation**: Comprehensive input validation for all operations
+- **Performance**: Optimized for concurrent operations (<10 simultaneous searches)
+- **Security**: API key authentication and secure connection management
+
+### 🧪 **Developer Experience**
+- **TypeScript First**: Full type safety with strict mode enabled
+- **TDD Approach**: Comprehensive test coverage with 27+ test files
+- **Fast Tooling**: Biome for <500ms linting and formatting
+- **Auto-Validation**: Pre-commit hooks ensure code quality
+
+## Installation
+
+### Prerequisites
+
+- **VS Code**: 1.74.0 or higher
+- **Node.js**: LTS 20.x or higher
+- **Qdrant**: Local instance (file mode) or remote server
+
+### Setup
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/danieldekay/vscode-ui-qdrant.git
+   cd vscode-ui-qdrant
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Build the extension**:
+   ```bash
+   npm run build
+   ```
+
+4. **Install in VS Code**:
+   - Open VS Code
+   - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
+   - Run `Extensions: Install from VSIX`
+   - Select the generated `.vsix` file from the `dist` directory
+
+## Configuration
+
+The extension provides comprehensive configuration options accessible through VS Code settings (`Ctrl+,`).
+
+### Connection Settings
+
+| Setting | Description | Default | Required |
+|---------|-------------|---------|----------|
+| `qdrant.connection.url` | Qdrant server URL or local file path | `file:///tmp/qdrant.db` | Yes |
+| `qdrant.connection.apiKey` | API key for authentication | `""` | No |
+| `qdrant.connection.timeout` | Connection timeout in milliseconds | `30000` | No |
+
+### Collection Defaults
+
+| Setting | Description | Default | Required |
+|---------|-------------|---------|----------|
+| `qdrant.collection.vectors.size` | Default vector dimension | `1536` | Yes |
+| `qdrant.collection.vectors.distance` | Distance metric | `"Cosine"` | Yes |
+| `qdrant.collection.onDisk` | Store vectors on disk | `false` | No |
+
+### Search Parameters
+
+| Setting | Description | Default | Required |
+|---------|-------------|---------|----------|
+| `qdrant.search.limit` | Maximum search results | `10` | No |
+| `qdrant.search.scoreThreshold` | Minimum similarity score | `0.0` | No |
+
+### UI Preferences
+
+| Setting | Description | Default | Required |
+|---------|-------------|---------|----------|
+| `qdrant.ui.autoConnect` | Auto-connect on startup | `false` | No |
+| `qdrant.ui.notifications` | Show operation notifications | `true` | No |
+
+## Usage
+
+### Getting Started
+
+1. **Configure Connection**:
+   - Open VS Code settings
+   - Search for "Qdrant"
+   - Set your connection URL and API key
+
+2. **Connect to Qdrant**:
+   - Press `Ctrl+Shift+P`
+   - Run `Qdrant: Connect`
+   - Check status bar for connection status
+
+3. **Explore Collections**:
+   - Open Qdrant view in sidebar
+   - Browse existing collections
+   - View collection information and statistics
+
+### Basic Operations
+
+#### Creating a Collection
+
+```typescript
+// Via VS Code commands
+// 1. Ctrl+Shift+P → "Qdrant: Create Collection"
+// 2. Enter collection name
+// 3. Collection created with default settings
 ```
+
+#### Searching Vectors
+
+```typescript
+// Via VS Code commands
+// 1. Ctrl+Shift+P → "Qdrant: Search"
+// 2. Select collection
+// 3. Enter search vector (JSON format)
+// 4. View results in output panel
+```
+
+#### Managing Data
+
+```typescript
+// Via VS Code commands
+// 1. Ctrl+Shift+P → "Qdrant: Upsert Vectors"
+// 2. Select collection
+// 3. Provide vector data (JSON format)
+// 4. Confirm operation
+```
+
+### Advanced Usage
+
+#### Custom Search Parameters
+
+```json
+{
+  "collectionName": "my_collection",
+  "vector": [0.1, 0.2, 0.3, ...],
+  "limit": 20,
+  "score_threshold": 0.8
+}
+```
+
+#### Batch Operations
+
+```json
+[
+  {
+    "id": "vec_1",
+    "vector": [0.1, 0.2, 0.3, ...],
+    "payload": { "text": "Sample text", "metadata": {} }
+  },
+  {
+    "id": "vec_2",
+    "vector": [0.4, 0.5, 0.6, ...],
+    "payload": { "text": "Another text", "metadata": {} }
+  }
+]
+```
+
+## API Reference
+
+### QdrantService Interface
+
+```typescript
+interface IQdrantService {
+  // Connection Management
+  connect(config: QdrantConfig): Promise<void>;
+  disconnect(): Promise<void>;
+  isConnected(): boolean;
+  getConnectionStatus(): ConnectionStatus;
+
+  // Collection Operations
+  createCollection(config: CollectionConfig): Promise<void>;
+  deleteCollection(name: string): Promise<void>;
+  listCollections(): Promise<string[]>;
+  collectionExists(name: string): Promise<boolean>;
+  getCollectionInfo(name: string): Promise<CollectionInfo>;
+
+  // Vector Operations
+  upsert(collectionName: string, points: VectorData[]): Promise<void>;
+  search(request: SearchRequest): Promise<SearchResult[]>;
+  delete(collectionName: string, ids: string[]): Promise<void>;
+
+  // Health Check
+  healthCheck(): Promise<boolean>;
+}
+```
+
+### Error Types
+
+The extension provides comprehensive error handling with specific error types:
+
+- `QdrantConnectionError`: Connection failures (retryable)
+- `QdrantAuthenticationError`: Authentication issues
+- `QdrantCollectionError`: Collection operation failures
+- `QdrantValidationError`: Input validation errors
+- `QdrantVectorError`: Vector operation failures
+- `QdrantSearchError`: Search operation failures (retryable)
+
+### VS Code Commands
+
+| Command | Description | Keybinding |
+|---------|-------------|------------|
+| `qdrant.connect` | Connect to Qdrant server | - |
+| `qdrant.disconnect` | Disconnect from server | - |
+| `qdrant.openSearch` | Open search interface | - |
+| `qdrant.openCollections` | Open collections view | - |
+| `qdrant.createCollection` | Create new collection | - |
+| `qdrant.refresh` | Refresh all views | - |
+
+## Examples
+
+### Local Development Setup
+
+```bash
+# Start local Qdrant instance
+docker run -p 6333:6333 qdrant/qdrant
+
+# Configure VS Code extension
+# Settings → Qdrant → Connection URL: http://localhost:6333
+```
+
+### Production Configuration
+
+```json
+{
+  "qdrant.connection.url": "https://your-qdrant-instance.com",
+  "qdrant.connection.apiKey": "your-api-key-here",
+  "qdrant.connection.timeout": 10000,
+  "qdrant.collection.vectors.size": 1536,
+  "qdrant.collection.vectors.distance": "Cosine",
+  "qdrant.search.limit": 20,
+  "qdrant.search.scoreThreshold": 0.7
+}
+```
+
+### Semantic Search Example
+
+```typescript
+// Search for similar documents
+const searchRequest = {
+  collectionName: "documents",
+  vector: [0.1, 0.2, 0.3, /* ... 1533 more dimensions ... */],
+  limit: 10,
+  score_threshold: 0.8
+};
+
+// Results include similarity scores and metadata
+const results = await qdrantService.search(searchRequest);
+```
+
+## Troubleshooting
+
+### Connection Issues
+
+**Problem**: Cannot connect to Qdrant server
+**Solutions**:
+- Verify server URL and port
+- Check API key configuration
+- Ensure server is running and accessible
+- Try increasing timeout value
+
+**Problem**: Authentication failed
+**Solutions**:
+- Verify API key is correct
+- Check API key permissions
+- Use VS Code command "Update API Key" for easy configuration
+
+### Performance Issues
+
+**Problem**: Slow search operations
+**Solutions**:
+- Reduce search limit
+- Increase score threshold to filter results
+- Check network latency to server
+- Consider using local file mode for development
+
+### Validation Errors
+
+**Problem**: Invalid collection name
+**Solutions**:
+- Use only alphanumeric characters, hyphens, and underscores
+- Ensure name is not empty and ≤ 255 characters
+- Check for leading/trailing whitespace
+
+**Problem**: Invalid vector dimensions
+**Solutions**:
+- Ensure vectors are exactly 1536 dimensions (OpenAI embedding size)
+- Verify all vector elements are finite numbers
+- Check for NaN or Infinity values
+
+### Common Error Messages
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `Connection Failed` | Server unreachable | Check URL and network |
+| `Authentication Failed` | Invalid API key | Update API key in settings |
+| `Collection not found` | Collection doesn't exist | Create collection first |
+| `Invalid vector dimensions` | Wrong vector size | Ensure 1536 dimensions |
+| `Validation Error` | Invalid input | Check input format |
+
+## Development
+
+### Project Structure
+
+```
+src/
+├── services/           # Qdrant service implementation
+├── types/             # TypeScript type definitions
+├── validation/        # Input validation functions
+└── index.ts           # VS Code extension entry point
+
+tests/
+├── unit/              # Unit tests
+├── integration/       # Integration tests
+├── contract/          # Contract tests
+└── performance/       # Performance tests
+```
+
+### Testing
+
+The project uses comprehensive testing with 27+ test files:
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test categories
+npm run test:unit        # Unit tests only
+npm run test:integration # Integration tests
+npm run test:performance # Performance validation
+```
+
+### Code Quality
+
+- **TypeScript 5.x**: Strict mode with full type checking
+- **Biome**: Fast linting and formatting (<500ms)
+- **TDD Approach**: Tests written before implementation
+- **Pre-commit Hooks**: Automatic validation on commit
+
+### Performance Targets
+
+- **Concurrent Operations**: <10 simultaneous searches supported
+- **Type Checking**: <500ms incremental checks
+- **Linting**: <500ms with Biome
+- **Compilation**: <800ms full build
+- **Test Execution**: Variable based on test scope
+
+## Contributing
+
+We welcome contributions! Please follow these guidelines:
+
+1. **TDD Approach**: Write tests before implementing features
+2. **Code Quality**: Ensure all checks pass (`npm run pretest`)
+3. **Documentation**: Update README for new features
+4. **Type Safety**: Maintain strict TypeScript compliance
+5. **Performance**: Consider performance impact of changes
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch
+3. Write tests for your feature
+4. Implement the feature
+5. Ensure all tests pass
+6. Update documentation
+7. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Qdrant](https://qdrant.tech/) for the excellent vector database
+- [VS Code](https://code.visualstudio.com/) for the extensible development environment
+- [Biome](https://biomejs.dev/) for fast code quality tools
+- [TypeScript](https://www.typescriptlang.org/) for type safety
+
+---
+
+**Built with ❤️ for the vector database community**
 
 ## Code Quality & Formatting
 

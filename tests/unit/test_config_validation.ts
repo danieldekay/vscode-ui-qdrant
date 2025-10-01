@@ -41,7 +41,9 @@ describe('Configuration Validation Unit Tests', () => {
     fs.writeFileSync(originalTsconfigPath, JSON.stringify(tsconfig, null, 2));
 
     // Import and test the validation function
-    const { validateTsConfig } = require('../../scripts/validate-tsconfig.js');
+    const { validateTsConfig } = require(
+      path.resolve(__dirname, '../../../scripts/validate-tsconfig.js'),
+    );
 
     // Mock console methods to capture output
     const originalConsoleLog = console.log;
@@ -81,7 +83,9 @@ describe('Configuration Validation Unit Tests', () => {
 
     fs.writeFileSync(originalTsconfigPath, JSON.stringify(invalidTsconfig, null, 2));
 
-    const { validateTsConfig } = require('../../scripts/validate-tsconfig.js');
+    const { validateTsConfig } = require(
+      path.resolve(__dirname, '../../../scripts/validate-tsconfig.js'),
+    );
 
     const originalConsoleError = console.error;
     const originalExit = process.exit;
@@ -124,7 +128,9 @@ describe('Configuration Validation Unit Tests', () => {
 
     fs.writeFileSync(originalTsconfigPath, JSON.stringify(invalidTsconfig, null, 2));
 
-    const { validateTsConfig } = require('../../scripts/validate-tsconfig.js');
+    const { validateTsConfig } = require(
+      path.resolve(__dirname, '../../../scripts/validate-tsconfig.js'),
+    );
 
     const originalConsoleError = console.error;
     const originalExit = process.exit;
@@ -173,7 +179,9 @@ describe('Configuration Validation Unit Tests', () => {
 
     fs.writeFileSync(originalTsconfigPath, JSON.stringify(tsconfigWithWarnings, null, 2));
 
-    const { validateTsConfig } = require('../../scripts/validate-tsconfig.js');
+    const { validateTsConfig } = require(
+      path.resolve(__dirname, '../../../scripts/validate-tsconfig.js'),
+    );
 
     const originalConsoleLog = console.log;
     const logs: string[] = [];

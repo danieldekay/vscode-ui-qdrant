@@ -44,6 +44,115 @@
                     "contextualTitle": "Qdrant Collections"
                 }
             ]
+        },
+        "configuration": {
+            "title": "Qdrant",
+            "properties": {
+                "qdrant.connection.url": {
+                    "type": "string",
+                    "default": "file:///tmp/qdrant.db",
+                    "description": "Qdrant server URL. Use 'file://' for local file mode or 'http://'/'https://' for server mode."
+                },
+                "qdrant.connection.apiKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "API key for Qdrant server authentication (leave empty for local file mode)"
+                },
+                "qdrant.connection.timeout": {
+                    "type": "number",
+                    "default": 30000,
+                    "minimum": 1000,
+                    "maximum": 300000,
+                    "description": "Connection timeout in milliseconds"
+                },
+                "qdrant.collection.default.distance": {
+                    "type": "string",
+                    "enum": ["Cosine", "Euclid", "Dot"],
+                    "default": "Cosine",
+                    "enumDescriptions": [
+                        "Cosine similarity - best for semantic search",
+                        "Euclidean distance - best for spatial data",
+                        "Dot product - best for normalized vectors"
+                    ],
+                    "description": "Default distance metric for new collections"
+                },
+                "qdrant.collection.default.optimizers.segmentNumber": {
+                    "type": "number",
+                    "default": 2,
+                    "minimum": 1,
+                    "maximum": 100,
+                    "description": "Default number of segments for optimizer configuration"
+                },
+                "qdrant.collection.default.optimizers.memmapThreshold": {
+                    "type": "number",
+                    "default": 10000,
+                    "minimum": 1000,
+                    "maximum": 1000000,
+                    "description": "Default memory map threshold in bytes"
+                },
+                "qdrant.collection.default.hnsw.m": {
+                    "type": "number",
+                    "default": 16,
+                    "minimum": 4,
+                    "maximum": 100,
+                    "description": "Default number of bi-directional links (m) for HNSW index"
+                },
+                "qdrant.collection.default.hnsw.efConstruct": {
+                    "type": "number",
+                    "default": 100,
+                    "minimum": 4,
+                    "maximum": 1000,
+                    "description": "Default ef_construct parameter for HNSW index construction"
+                },
+                "qdrant.collection.default.hnsw.fullScanThreshold": {
+                    "type": "number",
+                    "default": 10000,
+                    "minimum": 100,
+                    "maximum": 100000,
+                    "description": "Default full scan threshold for HNSW index"
+                },
+                "qdrant.search.default.limit": {
+                    "type": "number",
+                    "default": 10,
+                    "minimum": 1,
+                    "maximum": 1000,
+                    "description": "Default number of results to return in searches"
+                },
+                "qdrant.search.default.scoreThreshold": {
+                    "type": "number",
+                    "default": 0.0,
+                    "minimum": 0.0,
+                    "maximum": 1.0,
+                    "description": "Default similarity score threshold (0.0 = no threshold)"
+                },
+                "qdrant.search.default.withPayload": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether to include payload data in search results by default"
+                },
+                "qdrant.search.default.withVector": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to include vector data in search results by default"
+                },
+                "qdrant.ui.autoConnect": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically connect to Qdrant when extension activates"
+                },
+                "qdrant.ui.showConnectionStatus": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show connection status in the status bar"
+                },
+                "qdrant.ui.refreshInterval": {
+                    "type": "number",
+                    "default": 30000,
+                    "minimum": 5000,
+                    "maximum": 300000,
+                    "description": "Interval in milliseconds to refresh collection data in UI"
+                }
+            }
         }
     },
     "scripts": {
@@ -60,20 +169,34 @@
         "dev": "tsc --watch",
         "build": "tsc",
         "check": "npm run typecheck && npm run lint",
-        "test": "node ./out/test/runTest.js"
+        "test": "node -e \"require('./out/test/runTest.js').run().catch(err => { console.error('Tests failed:', err); process.exit(1); })\""
+    },
+    "mocha": {
+        "spec": "out/tests/**/*.test.js",
+        "timeout": 10000,
+        "ui": "tdd",
+        "colors": true,
+        "require": [
+            "tsx"
+        ]
     },
     "devDependencies": {
         "@biomejs/biome": "2.2.4",
+        "@types/chai": "^5.2.2",
         "@types/glob": "^8.1.0",
         "@types/mocha": "^10.0.1",
         "@types/node": "20.x",
         "@types/vscode": "^1.74.0",
         "@typescript-eslint/eslint-plugin": "^5.42.0",
         "@typescript-eslint/parser": "^5.42.0",
+        "chai": "^6.2.0",
         "eslint": "^8.28.0",
         "glob": "^8.1.0",
         "mocha": "^10.1.0",
         "tsx": "^4.20.6",
         "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@qdrant/js-client-rest": "^1.15.1"
     }
 }

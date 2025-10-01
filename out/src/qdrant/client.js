@@ -134,7 +134,7 @@ class QdrantClient {
             'Content-Type': 'application/json',
         };
         if (apiKey) {
-            headers['Authorization'] = `Bearer ${apiKey}`;
+            headers.Authorization = `Bearer ${apiKey}`;
         }
         return headers;
     }
