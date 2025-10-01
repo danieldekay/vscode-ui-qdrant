@@ -1,8 +1,8 @@
 # Feature Specification: Linting and Formatting
 
-**Feature Branch**: `002-linting-and-formatting`  
-**Created**: 2025-10-01  
-**Status**: Draft  
+**Feature Branch**: `002-linting-and-formatting`
+**Created**: 2025-10-01
+**Status**: Draft
 **Input**: User description: "Linting and Formatting - Use Biome (recommended) OR ESLint + Prettier. Install a watchdog or similar to automatically do it on save of files."
 
 ## Execution Flow (main)
@@ -41,45 +41,45 @@ As a developer working on the VSCode UI Qdrant extension, I want my code to be a
 
 ### Acceptance Scenarios
 
-1. **Given** a TypeScript file with formatting inconsistencies (mixed indentation, inconsistent quotes)  
-   **When** the developer saves the file in VS Code  
+1. **Given** a TypeScript file with formatting inconsistencies (mixed indentation, inconsistent quotes)
+   **When** the developer saves the file in VS Code
    **Then** the file is automatically formatted according to project standards within 100ms
 
-2. **Given** a TypeScript file with a linting error (unused variable, type error)  
-   **When** the developer saves the file  
+2. **Given** a TypeScript file with a linting error (unused variable, type error)
+   **When** the developer saves the file
    **Then** the linting error is highlighted inline in the editor with a clear explanation
 
-3. **Given** a developer opens the project in VS Code for the first time  
-   **When** they save any TypeScript file  
+3. **Given** a developer opens the project in VS Code for the first time
+   **When** they save any TypeScript file
    **Then** automatic formatting and linting are active without manual setup
 
-4. **Given** a file that passes all linting rules  
-   **When** the developer saves the file  
+4. **Given** a file that passes all linting rules
+   **When** the developer saves the file
    **Then** no errors or warnings are shown and the file remains unchanged
 
-5. **Given** a developer running the build command  
-   **When** linting errors exist in any file  
+5. **Given** a developer running the build command
+   **When** linting errors exist in any file
    **Then** the build fails with clear error messages indicating which files need fixing
 
-6. **Given** multiple files being edited simultaneously  
-   **When** the developer saves all files  
+6. **Given** multiple files being edited simultaneously
+   **When** the developer saves all files
    **Then** each file is linted and formatted independently without conflicts
 
 ### Edge Cases
 
-- **What happens when a file has both formatting and linting issues?**  
+- **What happens when a file has both formatting and linting issues?**
   Both should be addressed: formatting first, then linting validation on the formatted code.
 
-- **How does the system handle very large files (>10,000 lines)?**  
+- **How does the system handle very large files (>10,000 lines)?**
   Linting and formatting should complete within a reasonable time (<2 seconds) or provide progress feedback.
 
-- **What happens when linting rules conflict with auto-formatting rules?**  
+- **What happens when linting rules conflict with auto-formatting rules?**
   The system must ensure linting and formatting rules are compatible and don't fight each other.
 
-- **How does the system handle files in node_modules or dist/?**  
+- **How does the system handle files in node_modules or dist/?**
   Generated and dependency files should be excluded from linting and formatting by default.
 
-- **What happens when a developer disables auto-format-on-save in their VS Code settings?**  
+- **What happens when a developer disables auto-format-on-save in their VS Code settings?**
   The linting should still run, but formatting respects user preference while CI/build validation remains enforced.
 
 ## Requirements *(mandatory)*
@@ -87,7 +87,7 @@ As a developer working on the VSCode UI Qdrant extension, I want my code to be a
 ### Functional Requirements
 
 - **FR-001**: System MUST automatically lint TypeScript files on save in VS Code
-- **FR-002**: System MUST automatically format TypeScript files on save in VS Code  
+- **FR-002**: System MUST automatically format TypeScript files on save in VS Code
 - **FR-003**: System MUST complete formatting operations within 100ms for files under 1,000 lines
 - **FR-004**: System MUST display linting errors inline in the editor with actionable explanations
 - **FR-005**: System MUST exclude generated files (dist/, node_modules/) from linting and formatting
@@ -168,7 +168,7 @@ As a developer working on the VSCode UI Qdrant extension, I want my code to be a
 ### Requirement Completeness
 
 - [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous  
+- [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Scope is clearly bounded
 - [x] Dependencies and assumptions identified

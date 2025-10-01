@@ -102,7 +102,7 @@ npx tsc           # Full compilation with output
 ## Troubleshooting
 
 **TypeScript not found**: Ensure TypeScript is installed locally in project
-**Configuration ignored**: Check tsconfig.json syntax and file location  
+**Configuration ignored**: Check tsconfig.json syntax and file location
 **No source maps**: Verify `sourceMap: true` in compiler options
 **Wrong target output**: Check `target` setting in compiler options
 **VS Code issues**: Restart TypeScript language service (Cmd+Shift+P → "TypeScript: Restart TS Server")

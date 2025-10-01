@@ -213,7 +213,7 @@ npm run format:fix
 
 **Biome not found**: Ensure Biome is installed locally with `npm install`
 
-**Auto-format not working**: 
+**Auto-format not working**:
 - Check VS Code settings.json has `editor.formatOnSave: true`
 - Verify Biome extension is installed and enabled
 - Ensure `editor.defaultFormatter` is set to "biomejs.biome"

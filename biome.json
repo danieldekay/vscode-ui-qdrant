@@ -22,10 +22,7 @@
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "files": {
-    "includes": [
-      "**/src/**/*.ts",
-      "**/tests/**/*.ts"
-    ]
+    "includes": ["**/src/**/*.ts", "**/tests/**/*.ts"]
   },
   "javascript": {
     "formatter": {

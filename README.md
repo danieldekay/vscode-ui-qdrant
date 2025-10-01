@@ -272,6 +272,61 @@ All scripts are designed for automated environments:
 - Consistent behavior across different environments
 - Fast execution suitable for CI pipelines
 
+## Alternative Tool Configurations
+
+This project uses Biome for linting and formatting, but alternative configurations are supported:
+
+### ESLint + Prettier (Alternative)
+
+If you prefer ESLint and Prettier instead of Biome:
+
+```bash
+# Install alternative tools
+npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier
+
+# Update package.json scripts
+{
+  "scripts": {
+    "lint": "eslint src tests --ext .ts",
+    "format": "prettier --check src tests",
+    "format:fix": "prettier --write src tests"
+  }
+}
+```
+
+### TSLint (Legacy)
+
+For projects still using TSLint (deprecated, consider migrating to ESLint):
+
+```bash
+npm install --save-dev tslint typescript
+
+{
+  "scripts": {
+    "lint": "tslint -p ."
+  }
+}
+```
+
+### StandardJS (Opinionated)
+
+For projects preferring StandardJS style:
+
+```bash
+npm install --save-dev standard
+
+{
+  "scripts": {
+    "lint": "standard src tests",
+    "format": "standard --fix src tests"
+  }
+}
+```
+
+### Custom Toolchains
+
+The npm script structure supports any linting/formatting tools. Simply update the commands in package.json scripts section while maintaining the same script names for consistency.
+
 ## Contributing
 
 1. Ensure all TypeScript files pass type checking

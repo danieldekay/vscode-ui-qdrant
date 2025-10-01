@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Package Scripts Validation API
+  version: 1.0.0
+  description: API for validating and executing standardized npm scripts
+
+paths:
+  /validate-scripts:
+    post:
+      summary: Validate npm scripts configuration
+      description: Validates that package.json contains all required npm scripts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scripts:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Map of script names to commands
+                  example:
+                    typecheck: "tsc --noEmit"
+                    lint: "biome check src tests"
+                    format: "biome format --write src tests"
+                    dev: "tsx watch src/extension.ts"
+                    build: "tsc"
+                    check: "npm run typecheck && npm run lint"
+              required:
+                - scripts
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                    description: Whether all required scripts are present and valid
+                  missing:
+                    type: array
+                    items:
+                      type: string
+                    description: Names of missing required scripts
+                  invalid:
+                    type: array
+                    items:
+                      type: string
+                    description: Names of scripts with invalid commands
+                required:
+                  - valid
+
+  /execute-script:
+    post:
+      summary: Execute a npm script
+      description: Executes a specific npm script in the project directory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scriptName:
+                  type: string
+                  enum: [typecheck, lint, format, dev, build, check]
+                  description: Name of the script to execute
+                workingDirectory:
+                  type: string
+                  description: Absolute path to the project directory
+              required:
+                - scriptName
+                - workingDirectory
+      responses:
+        '200':
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Whether the script executed successfully
+                  output:
+                    type: string
+                    description: Combined stdout and stderr output
+                  error:
+                    type: string
+                    description: Error message if execution failed
+                required:
+                  - success
+                  - output</content>
+<parameter name="filePath">/Users/dekay/Dokumente/projects/programmieren/vscode-ui-qdrant/specs/003-package-scripts-required/contracts/scripts-api.yaml

@@ -1,8 +1,8 @@
 # Feature Specification: TypeScript Configuration
 
-**Feature Branch**: `001-typescript-configuration`  
-**Created**: 2025-10-01  
-**Status**: Draft  
+**Feature Branch**: `001-typescript-configuration`
+**Created**: 2025-10-01
+**Status**: Draft
 **Input**: User description: "TypeScript Configuration - Use TypeScript 5.x or higher, Enable strict mode and all strict flags, Output ES2022 or higher, Generate source maps for debugging"
 
 ## Execution Flow (main)

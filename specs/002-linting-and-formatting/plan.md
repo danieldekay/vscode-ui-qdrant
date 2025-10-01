@@ -37,14 +37,14 @@ Establish automated code quality and formatting system for the VSCode UI Qdrant 
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x (latest stable) with Node.js LTS 20.x+ runtime  
-**Primary Dependencies**: Linting/formatting tool (Biome OR ESLint + Prettier), VS Code extension API, existing TypeScript compiler integration  
-**Storage**: Configuration files (committed to version control), VS Code workspace settings  
-**Testing**: TypeScript compiler type checking, automated linting validation, formatting consistency tests  
+**Language/Version**: TypeScript 5.x (latest stable) with Node.js LTS 20.x+ runtime
+**Primary Dependencies**: Linting/formatting tool (Biome OR ESLint + Prettier), VS Code extension API, existing TypeScript compiler integration
+**Storage**: Configuration files (committed to version control), VS Code workspace settings
+**Testing**: TypeScript compiler type checking, automated linting validation, formatting consistency tests
 **Target Platform**: VS Code Extension Host environment (Node.js based)
-**Project Type**: single - VS Code extension with unified source structure  
-**Performance Goals**: <100ms formatting for files <1,000 lines, <500ms linting feedback, non-blocking editor operations  
-**Constraints**: Must integrate with existing TypeScript 5.x configuration, constitutional requirement for modern tools (2025-current), zero additional developer setup after npm install  
+**Project Type**: single - VS Code extension with unified source structure
+**Performance Goals**: <100ms formatting for files <1,000 lines, <500ms linting feedback, non-blocking editor operations
+**Constraints**: Must integrate with existing TypeScript 5.x configuration, constitutional requirement for modern tools (2025-current), zero additional developer setup after npm install
 **Scale/Scope**: Single project affecting all TypeScript files in extension codebase, automated workflow for all developers
 
 ## Constitution Check
@@ -256,8 +256,8 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 
 _These phases are beyond the scope of the /plan command_
 
-**Phase 3**: Task execution (/tasks command creates tasks.md)  
-**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 3**: Task execution (/tasks command creates tasks.md)
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)
 **Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking

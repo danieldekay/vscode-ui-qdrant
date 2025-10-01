@@ -27,10 +27,14 @@
         "watch": "tsc -watch -p ./",
         "validate-config": "node scripts/validate-tsconfig.js",
         "pretest": "npm run validate-config && npm run lint && npm run compile",
+        "typecheck": "tsc --noEmit",
         "lint": "biome check src tests",
         "lint:fix": "biome check --write src tests",
         "format": "biome format src tests",
         "format:fix": "biome format --write src tests",
+        "dev": "tsc --watch",
+        "build": "tsc",
+        "check": "npm run typecheck && npm run lint",
         "test": "node ./out/test/runTest.js"
     },
     "devDependencies": {
@@ -44,6 +48,7 @@
         "eslint": "^8.28.0",
         "glob": "^8.1.0",
         "mocha": "^10.1.0",
+        "tsx": "^4.20.6",
         "typescript": "^5.0.0"
     }
 }
