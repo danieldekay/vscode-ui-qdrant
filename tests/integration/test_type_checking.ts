@@ -1,12 +1,13 @@
-import { execSync } from "child_process";
-import * as fs from "fs";
-import * as path from "path";
+import * as assert from 'node:assert';
+import { execSync } from 'node:child_process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
-describe("Type Checking Validation", () => {
-  const srcDir = path.join(__dirname, "../../src");
-  const testFile = path.join(srcDir, "test-type-checking.ts");
+describe('Type Checking Validation', () => {
+  const srcDir = path.join(__dirname, '../../src');
+  const testFile = path.join(srcDir, 'test-type-checking.ts');
 
-  beforeAll(() => {
+  beforeEach(() => {
     // Create a test file with various type checking scenarios
     const testContent = `
 export interface User {
@@ -51,60 +52,71 @@ export function unusedLocalFunction(): void {
     fs.writeFileSync(testFile, testContent);
   });
 
-  afterAll(() => {
+  afterEach(() => {
     // Clean up test file
     if (fs.existsSync(testFile)) {
       fs.unlinkSync(testFile);
     }
   });
 
-  it("should enforce strict mode type checking", () => {
+  it('should enforce strict mode type checking', () => {
     // This test should fail until tsconfig.json is created
-    const tsconfigPath = path.join(__dirname, "../../tsconfig.json");
-    expect(fs.existsSync(tsconfigPath)).toBe(true);
+    const tsconfigPath = path.join(__dirname, '../../tsconfig.json');
+    assert.ok(fs.existsSync(tsconfigPath), 'tsconfig.json should exist');
 
     try {
       // Run type checking only (noEmit)
-      execSync("npx tsc --noEmit", { cwd: path.join(__dirname, "../..") });
-      fail(
-        "Expected TypeScript type checking to fail due to strict mode violations"
-      );
-    } catch (error: any) {
+      execSync('npx tsc --noEmit', { cwd: path.join(__dirname, '../..') });
+      assert.fail('Expected TypeScript type checking to fail due to strict mode violations');
+    } catch (error) {
       // Should fail with multiple errors
-      expect(error.status).not.toBe(0);
-      const output = error.stdout.toString();
+      const execError = error as { status: number; stdout: Buffer };
+      assert.notStrictEqual(execError.status, 0, 'Should exit with error code');
+      const output = execError.stdout.toString();
 
       // Check for expected strict mode errors
-      expect(output).toMatch(/error|Error/);
+      assert.ok(/error|Error/.test(output), 'Should report errors');
 
       // Should catch unused parameters
-      expect(output).toMatch(/unused|Unused/);
+      assert.ok(/unused|Unused/.test(output), 'Should catch unused parameters');
 
       // Should catch implicit returns
-      expect(output).toMatch(/return|Return/);
+      assert.ok(/return|Return/.test(output), 'Should catch implicit returns');
     }
   });
 
-  it("should validate strict compiler options are enabled", () => {
+  it('should validate strict compiler options are enabled', () => {
     // This test should fail until tsconfig.json is created
-    const tsconfigPath = path.join(__dirname, "../../tsconfig.json");
-    expect(fs.existsSync(tsconfigPath)).toBe(true);
+    const tsconfigPath = path.join(__dirname, '../../tsconfig.json');
+    assert.ok(fs.existsSync(tsconfigPath), 'tsconfig.json should exist');
 
-    const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, "utf8"));
+    const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, 'utf8'));
 
-    expect(tsconfig.compilerOptions.strict).toBe(true);
-    expect(tsconfig.compilerOptions.noUnusedLocals).toBe(true);
-    expect(tsconfig.compilerOptions.noUnusedParameters).toBe(true);
-    expect(tsconfig.compilerOptions.noImplicitReturns).toBe(true);
+    assert.strictEqual(tsconfig.compilerOptions.strict, true, 'strict should be enabled');
+    assert.strictEqual(
+      tsconfig.compilerOptions.noUnusedLocals,
+      true,
+      'noUnusedLocals should be enabled',
+    );
+    assert.strictEqual(
+      tsconfig.compilerOptions.noUnusedParameters,
+      true,
+      'noUnusedParameters should be enabled',
+    );
+    assert.strictEqual(
+      tsconfig.compilerOptions.noImplicitReturns,
+      true,
+      'noImplicitReturns should be enabled',
+    );
   });
 
-  it("should pass type checking for valid code", () => {
+  it('should pass type checking for valid code', () => {
     // This test should fail until tsconfig.json is created
-    const tsconfigPath = path.join(__dirname, "../../tsconfig.json");
-    expect(fs.existsSync(tsconfigPath)).toBe(true);
+    const tsconfigPath = path.join(__dirname, '../../tsconfig.json');
+    assert.ok(fs.existsSync(tsconfigPath), 'tsconfig.json should exist');
 
     // Create a valid TypeScript file
-    const validFile = path.join(srcDir, "valid-test.ts");
+    const validFile = path.join(srcDir, 'valid-test.ts');
     const validContent = `
 export function greet(name: string): string {
   return \`Hello, \${name}!\`;
@@ -123,12 +135,13 @@ export function createPerson(name: string, age: number): Person {
 
     try {
       // This should pass
-      execSync("npx tsc --noEmit", { cwd: path.join(__dirname, "../..") });
+      execSync('npx tsc --noEmit', { cwd: path.join(__dirname, '../..') });
       // If we get here, type checking passed (good)
-    } catch (error: any) {
+    } catch (error) {
       // If it fails, it should not be due to our valid file
-      const output = error.stdout.toString();
-      expect(output).not.toMatch(/valid-test\.ts/);
+      const execError = error as { stdout: Buffer };
+      const output = execError.stdout.toString();
+      assert.ok(!/valid-test\.ts/.test(output), 'Should not fail on valid test file');
     } finally {
       // Clean up
       if (fs.existsSync(validFile)) {

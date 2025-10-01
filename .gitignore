@@ -32,6 +32,9 @@ jspm_packages/
 # Optional eslint cache
 .eslintcache
 
+# Biome cache
+.biome-cache/
+
 # Output of 'npm pack'
 *.tgz
 

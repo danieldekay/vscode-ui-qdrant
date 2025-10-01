@@ -1,18 +1,19 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as assert from 'node:assert';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
-describe("Configuration Validation Unit Tests", () => {
-  const originalTsconfigPath = path.join(__dirname, "../../tsconfig.json");
-  const backupTsconfigPath = path.join(__dirname, "../../tsconfig.json.backup");
+describe('Configuration Validation Unit Tests', () => {
+  const originalTsconfigPath = path.join(__dirname, '../../tsconfig.json');
+  const backupTsconfigPath = path.join(__dirname, '../../tsconfig.json.backup');
 
-  beforeAll(() => {
+  beforeEach(() => {
     // Backup original tsconfig.json
     if (fs.existsSync(originalTsconfigPath)) {
       fs.copyFileSync(originalTsconfigPath, backupTsconfigPath);
     }
   });
 
-  afterAll(() => {
+  afterEach(() => {
     // Restore original tsconfig.json
     if (fs.existsSync(backupTsconfigPath)) {
       fs.copyFileSync(backupTsconfigPath, originalTsconfigPath);
@@ -20,27 +21,27 @@ describe("Configuration Validation Unit Tests", () => {
     }
   });
 
-  it("should validate correct tsconfig.json structure", () => {
+  it('should validate correct tsconfig.json structure', () => {
     const tsconfig = {
       compilerOptions: {
         strict: true,
-        target: "ES2022",
+        target: 'ES2022',
         sourceMap: true,
         noUnusedLocals: true,
         noUnusedParameters: true,
         noImplicitReturns: true,
         skipLibCheck: true,
-        outDir: "./dist",
-        rootDir: "./src",
+        outDir: './dist',
+        rootDir: './src',
       },
-      include: ["src/**/*"],
-      exclude: ["node_modules", "dist"],
+      include: ['src/**/*'],
+      exclude: ['node_modules', 'dist'],
     };
 
     fs.writeFileSync(originalTsconfigPath, JSON.stringify(tsconfig, null, 2));
 
     // Import and test the validation function
-    const { validateTsConfig } = require("../../scripts/validate-tsconfig.js");
+    const { validateTsConfig } = require('../../scripts/validate-tsconfig.js');
 
     // Mock console methods to capture output
     const originalConsoleLog = console.log;
@@ -48,103 +49,104 @@ describe("Configuration Validation Unit Tests", () => {
     const logs: string[] = [];
     const errors: string[] = [];
 
-    console.log = (...args) => logs.push(args.join(" "));
-    console.error = (...args) => errors.push(args.join(" "));
+    console.log = (...args) => logs.push(args.join(' '));
+    console.error = (...args) => errors.push(args.join(' '));
 
     try {
       // This should not throw
       validateTsConfig();
 
-      expect(errors.length).toBe(0);
-      expect(logs.some((log) => log.includes("✅"))).toBe(true);
-      expect(logs.some((log) => log.includes("compliant"))).toBe(true);
+      assert.strictEqual(errors.length, 0, 'Should have no errors');
+      assert.ok(
+        logs.some((log) => log.includes('✅')),
+        'Should log success',
+      );
+      assert.ok(
+        logs.some((log) => log.includes('compliant')),
+        'Should log compliance',
+      );
     } finally {
       console.log = originalConsoleLog;
       console.error = originalConsoleError;
     }
   });
 
-  it("should reject tsconfig.json with missing required options", () => {
+  it('should reject tsconfig.json with missing required options', () => {
     const invalidTsconfig = {
       compilerOptions: {
         // Missing required options
-        target: "ES2022",
+        target: 'ES2022',
       },
     };
 
-    fs.writeFileSync(
-      originalTsconfigPath,
-      JSON.stringify(invalidTsconfig, null, 2)
-    );
+    fs.writeFileSync(originalTsconfigPath, JSON.stringify(invalidTsconfig, null, 2));
 
-    const { validateTsConfig } = require("../../scripts/validate-tsconfig.js");
+    const { validateTsConfig } = require('../../scripts/validate-tsconfig.js');
 
     const originalConsoleError = console.error;
     const originalExit = process.exit;
     const errors: string[] = [];
     let exitCalled = false;
 
-    console.error = (...args) => errors.push(args.join(" "));
+    console.error = (...args) => errors.push(args.join(' '));
     process.exit = (() => {
       exitCalled = true;
-      throw new Error("exit");
-    }) as any;
+      throw new Error('exit');
+    }) as unknown as (code?: number) => never;
 
     try {
-      expect(() => validateTsConfig()).toThrow("exit");
-      expect(exitCalled).toBe(true);
-      expect(errors.length).toBeGreaterThan(0);
-      expect(
-        errors.some((error) =>
-          error.includes("Missing required compiler option")
-        )
-      ).toBe(true);
+      assert.throws(() => validateTsConfig(), /exit/, 'Should exit with error');
+      assert.ok(exitCalled, 'Exit should be called');
+      assert.ok(errors.length > 0, 'Should have errors');
+      assert.ok(
+        errors.some((error) => error.includes('Missing required compiler option')),
+        'Should report missing options',
+      );
     } finally {
       console.error = originalConsoleError;
       process.exit = originalExit;
     }
   });
 
-  it("should reject tsconfig.json with invalid option values", () => {
+  it('should reject tsconfig.json with invalid option values', () => {
     const invalidTsconfig = {
       compilerOptions: {
         strict: false, // Should be true
-        target: "ES5", // Should be ES2022+
+        target: 'ES5', // Should be ES2022+
         sourceMap: true,
         noUnusedLocals: true,
         noUnusedParameters: true,
         noImplicitReturns: true,
         skipLibCheck: true,
       },
-      include: ["src/**/*"],
+      include: ['src/**/*'],
     };
 
-    fs.writeFileSync(
-      originalTsconfigPath,
-      JSON.stringify(invalidTsconfig, null, 2)
-    );
+    fs.writeFileSync(originalTsconfigPath, JSON.stringify(invalidTsconfig, null, 2));
 
-    const { validateTsConfig } = require("../../scripts/validate-tsconfig.js");
+    const { validateTsConfig } = require('../../scripts/validate-tsconfig.js');
 
     const originalConsoleError = console.error;
     const originalExit = process.exit;
     const errors: string[] = [];
     let exitCalled = false;
 
-    console.error = (...args) => errors.push(args.join(" "));
+    console.error = (...args) => errors.push(args.join(' '));
     process.exit = (() => {
       exitCalled = true;
-      throw new Error("exit");
-    }) as any;
+      throw new Error('exit');
+    }) as unknown as (code?: number) => never;
 
     try {
-      expect(() => validateTsConfig()).toThrow("exit");
-      expect(exitCalled).toBe(true);
-      expect(errors.some((error) => error.includes("Invalid strict"))).toBe(
-        true
+      assert.throws(() => validateTsConfig(), /exit/, 'Should exit with error');
+      assert.ok(exitCalled, 'Exit should be called');
+      assert.ok(
+        errors.some((error) => error.includes('Invalid strict')),
+        'Should report invalid strict',
       );
-      expect(errors.some((error) => error.includes("Invalid target"))).toBe(
-        true
+      assert.ok(
+        errors.some((error) => error.includes('Invalid target')),
+        'Should report invalid target',
       );
     } finally {
       console.error = originalConsoleError;
@@ -152,40 +154,43 @@ describe("Configuration Validation Unit Tests", () => {
     }
   });
 
-  it("should provide warnings for non-critical configuration issues", () => {
+  it('should provide warnings for non-critical configuration issues', () => {
     const tsconfigWithWarnings = {
       compilerOptions: {
         strict: true,
-        target: "ES2022",
+        target: 'ES2022',
         sourceMap: true,
         noUnusedLocals: true,
         noUnusedParameters: true,
         noImplicitReturns: true,
         skipLibCheck: true,
-        outDir: "./build", // Non-standard
-        rootDir: "./lib", // Non-standard
+        outDir: './build', // Non-standard
+        rootDir: './lib', // Non-standard
       },
-      include: ["src/**/*"],
+      include: ['src/**/*'],
       // Missing exclude
     };
 
-    fs.writeFileSync(
-      originalTsconfigPath,
-      JSON.stringify(tsconfigWithWarnings, null, 2)
-    );
+    fs.writeFileSync(originalTsconfigPath, JSON.stringify(tsconfigWithWarnings, null, 2));
 
-    const { validateTsConfig } = require("../../scripts/validate-tsconfig.js");
+    const { validateTsConfig } = require('../../scripts/validate-tsconfig.js');
 
     const originalConsoleLog = console.log;
     const logs: string[] = [];
 
-    console.log = (...args) => logs.push(args.join(" "));
+    console.log = (...args) => logs.push(args.join(' '));
 
     try {
       validateTsConfig();
 
-      expect(logs.some((log) => log.includes("⚠️"))).toBe(true);
-      expect(logs.some((log) => log.includes("Consider excluding"))).toBe(true);
+      assert.ok(
+        logs.some((log) => log.includes('⚠️')),
+        'Should warn about missing excludes',
+      );
+      assert.ok(
+        logs.some((log) => log.includes('Consider excluding')),
+        'Should suggest excluding node_modules',
+      );
     } finally {
       console.log = originalConsoleLog;
     }
