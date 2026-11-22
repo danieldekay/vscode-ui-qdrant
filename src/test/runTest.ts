@@ -1,6 +1,7 @@
 import * as path from 'node:path';
 import { glob } from 'glob';
-import Mocha from 'mocha';
+
+const Mocha = require('mocha');
 
 export function run(): Promise<void> {
   // Create the mocha test
@@ -27,7 +28,7 @@ export function run(): Promise<void> {
 
       try {
         // Run the mocha test
-        mocha.run((failures) => {
+        mocha.run((failures: number) => {
           if (failures > 0) {
             reject(new Error(`${failures} tests failed.`));
           } else {

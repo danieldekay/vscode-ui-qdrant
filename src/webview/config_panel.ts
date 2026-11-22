@@ -68,6 +68,9 @@ export class QdrantConfigPanel {
           case 'validateConfig':
             await this._handleValidateConfig(message.config);
             break;
+          case 'autoDiscover':
+            await this._handleAutoDiscover();
+            break;
           default:
             console.warn('Unknown message type:', message.type);
         }
@@ -147,6 +150,27 @@ export class QdrantConfigPanel {
       valid: validation.valid,
       errors: validation.errors,
     });
+  }
+
+  private async _handleAutoDiscover() {
+    try {
+      // Execute the enhanced select local database file command
+      await vscode.commands.executeCommand('qdrant.selectLocalDbFileEnhanced');
+
+      // After successful auto-discovery, reload the configuration to update the form field
+      await this._handleLoadConfig();
+
+      this._panel.webview.postMessage({
+        type: 'autoDiscoverCompleted',
+        success: true,
+      });
+    } catch (error) {
+      this._panel.webview.postMessage({
+        type: 'autoDiscoverCompleted',
+        success: false,
+        error: error instanceof Error ? error.message : 'Auto-discovery failed',
+      });
+    }
   }
 
   private _getHtmlForWebview(): string {
@@ -287,6 +311,12 @@ export class QdrantConfigPanel {
               color: var(--vscode-button-background);
             }
 
+            .status-info {
+              background-color: var(--vscode-notificationsInfoIcon-foreground);
+              color: var(--vscode-button-background);
+              opacity: 0.8;
+            }
+
             .status-error {
               background-color: var(--vscode-inputValidation-errorBackground);
               color: var(--vscode-inputValidation-errorForeground);
@@ -384,6 +414,7 @@ export class QdrantConfigPanel {
             <div class="button-group">
               <button class="btn btn-primary" id="save-btn">Save Configuration</button>
               <button class="btn btn-secondary" id="validate-btn">Validate</button>
+              <button class="btn btn-secondary" id="autodiscover-btn">🔍 Auto-Discover Database</button>
               <button class="btn btn-danger" id="reset-btn">Reset to Defaults</button>
             </div>
 
@@ -406,6 +437,7 @@ export class QdrantConfigPanel {
             const defaultIncludeVector = document.getElementById('default-include-vector');
             const saveBtn = document.getElementById('save-btn');
             const validateBtn = document.getElementById('validate-btn');
+            const autodiscoverBtn = document.getElementById('autodiscover-btn');
             const resetBtn = document.getElementById('reset-btn');
             const statusMessage = document.getElementById('status-message');
             const validationErrors = document.getElementById('validation-errors');
@@ -416,6 +448,7 @@ export class QdrantConfigPanel {
             // Event listeners
             saveBtn.addEventListener('click', saveConfiguration);
             validateBtn.addEventListener('click', validateConfiguration);
+            autodiscoverBtn.addEventListener('click', autoDiscoverDatabase);
             resetBtn.addEventListener('click', resetConfiguration);
 
             // Functions
@@ -465,6 +498,11 @@ export class QdrantConfigPanel {
               if (confirm('Are you sure you want to reset all configuration to defaults?')) {
                 vscode.postMessage({ type: 'resetConfig' });
               }
+            }
+
+            function autoDiscoverDatabase() {
+              showStatus('Starting auto-discovery...', 'info');
+              vscode.postMessage({ type: 'autoDiscover' });
             }
 
             function showStatus(message, type = 'success') {
@@ -523,6 +561,15 @@ export class QdrantConfigPanel {
                   }
                   break;
 
+                case 'autoDiscoverCompleted':
+                  if (message.success) {
+                    showStatus('Auto-discovery completed! Check your workspace settings for the updated database path.');
+                    loadConfiguration(); // Reload to show updated configuration
+                  } else {
+                    showStatus(message.error || 'Auto-discovery failed', 'error');
+                  }
+                  break;
+
                 case 'configError':
                   showStatus(message.error, 'error');
                   break;
@@ -530,7 +577,7 @@ export class QdrantConfigPanel {
             });
 
             function populateForm(config) {
-              connectionUrl.value = config.url || '';
+              connectionUrl.value = config.databasePath || config.url || '';
               connectionPort.value = config.port || '';
               apiKey.value = config.apiKey || '';
               timeout.value = config.timeout || '';

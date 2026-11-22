@@ -9,6 +9,7 @@ import {
   type SearchParameters,
   validateSearchParameters,
 } from '../models/search_parameters';
+import type { QdrantConfiguration } from '../types/qdrant-configuration';
 
 /**
  * Service for managing VS Code configuration settings for Qdrant.
@@ -19,25 +20,29 @@ export class ConfigService {
   /**
    * Get the current Qdrant configuration from VS Code settings.
    */
-  getConfiguration(): SearchConfig {
-    const config = vscode.workspace.getConfiguration(ConfigService.CONFIG_SECTION);
+  public getConfiguration(): QdrantConfiguration {
+    const config = vscode.workspace.getConfiguration('qdrant');
 
-    const searchConfig: SearchConfig = {
-      host: config.get('connection.url', DEFAULT_SEARCH_CONFIG.host),
-      port: config.get('connection.port', DEFAULT_SEARCH_CONFIG.port) || DEFAULT_SEARCH_CONFIG.port,
-      apiKey: config.get('connection.apiKey', DEFAULT_SEARCH_CONFIG.apiKey),
-      collection: config.get('collection.default', DEFAULT_SEARCH_CONFIG.collection),
-      timeout: config.get('connection.timeout', DEFAULT_SEARCH_CONFIG.timeout),
+    return {
+      url: config.get<string>('connection.url') || 'http://localhost:6333',
+      databasePath: config.get<string>('localDbPath') || '',
+      host: config.get<string>('connection.url') || 'http://localhost:6333',
+      port: config.get<number>('connection.port') || 6333,
+      apiKey: config.get<string>('connection.apiKey'),
+      timeout: config.get<number>('connection.timeout') || 5000,
+      collection: config.get<string>('search.defaultCollection') || 'default',
+      useHttps: false,
+      retryCount: 3,
+      enabled: true,
+      name: 'Default Configuration',
+      defaultParameters: {
+        resultLimit: config.get<number>('search.defaultParameters.resultLimit') || 10,
+        similarityThreshold:
+          config.get<number>('search.defaultParameters.similarityThreshold') || 0.7,
+        includePayload: config.get<boolean>('search.defaultParameters.includePayload') ?? true,
+        includeVector: config.get<boolean>('search.defaultParameters.includeVector') ?? false,
+      },
     };
-
-    // Handle file:// URLs for local mode
-    if (searchConfig.host.startsWith('file://')) {
-      // For local file mode, we don't need host/port
-      searchConfig.host = 'localhost';
-      searchConfig.port = 6333; // Default port, will be ignored for local mode
-    }
-
-    return searchConfig;
   }
 
   /**

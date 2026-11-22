@@ -103,7 +103,7 @@ export class QdrantSearchPanel {
       } else {
         this._panel.webview.postMessage({
           type: 'searchError',
-          error: result.message,
+          error: (result as any).message,
         });
       }
     } catch (error) {

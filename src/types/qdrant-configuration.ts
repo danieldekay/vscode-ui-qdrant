@@ -6,6 +6,12 @@
  */
 
 export interface QdrantConfiguration {
+  /** Qdrant server URL (for local file connections) */
+  url?: string;
+
+  /** Local database file path */
+  databasePath?: string;
+
   /** Qdrant server host */
   host: string;
 
@@ -19,7 +25,7 @@ export interface QdrantConfiguration {
   useHttps: boolean;
 
   /** Request timeout in milliseconds */
-  timeout?: number;
+  timeout: number;
 
   /** Number of retry attempts for failed requests */
   retryCount?: number;
@@ -29,12 +35,25 @@ export interface QdrantConfiguration {
 
   /** User-friendly name for this configuration */
   name?: string;
+
+  /** Default collection for search operations */
+  collection: string;
+
+  /** Default search parameters */
+  defaultParameters?: {
+    resultLimit: number;
+    similarityThreshold: number;
+    includePayload: boolean;
+    includeVector: boolean;
+  };
 }
 
 /**
  * Default Qdrant configuration values
  */
 export const DEFAULT_QDRANT_CONFIGURATION: Required<QdrantConfiguration> = {
+  url: 'http://localhost:6333',
+  databasePath: '',
   host: 'localhost',
   port: 6333,
   apiKey: '',
@@ -43,6 +62,13 @@ export const DEFAULT_QDRANT_CONFIGURATION: Required<QdrantConfiguration> = {
   retryCount: 3,
   enabled: true,
   name: 'Default Configuration',
+  collection: 'default',
+  defaultParameters: {
+    resultLimit: 10,
+    similarityThreshold: 0.7,
+    includePayload: true,
+    includeVector: false,
+  },
 };
 
 /**

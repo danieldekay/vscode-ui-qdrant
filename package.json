@@ -11,15 +11,7 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [
-        "onCommand:qdrant.openSearch",
-        "onCommand:qdrant.openCollections",
-        "onCommand:qdrant.connect",
-        "onCommand:qdrant.disconnect",
-        "onCommand:qdrant.openConfig",
-        "onCommand:qdrant.selectLocalDbFile",
-        "onView:qdrantCollections"
-    ],
+    "activationEvents": [],
     "contributes": {
         "commands": [
             {
@@ -41,6 +33,10 @@
             {
                 "command": "qdrant.openConfig",
                 "title": "Qdrant: Open Configuration"
+            },
+            {
+                "command": "qdrant.selectLocalDbFileEnhanced",
+                "title": "Qdrant: Select Local Database File (Enhanced)"
             }
         ],
         "views": {
@@ -48,7 +44,8 @@
                 {
                     "id": "qdrantCollections",
                     "name": "Qdrant Collections",
-                    "contextualTitle": "Qdrant Collections"
+                    "contextualTitle": "Qdrant Collections",
+                    "icon": "$(database)"
                 }
             ]
         },
@@ -162,6 +159,11 @@
                     "minimum": 5000,
                     "maximum": 300000,
                     "description": "Interval in milliseconds to refresh collection data in UI"
+                },
+                "qdrant.localDbPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to local Qdrant database file or directory"
                 }
             }
         }
@@ -169,17 +171,21 @@
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
+        "watch": "tsc -watch -p ./tsconfig.prod.json",
+        "watch:all": "tsc -watch -p ./",
         "validate-config": "node scripts/validate-tsconfig.js",
         "pretest": "npm run validate-config && npm run lint && npm run compile",
         "typecheck": "tsc --noEmit",
+        "typecheck:prod": "tsc --noEmit -p ./tsconfig.prod.json",
         "lint": "biome check src tests",
         "lint:fix": "biome check --write src tests",
+        "lint:src": "biome check src",
         "format": "biome format src tests",
         "format:fix": "biome format --write src tests",
-        "dev": "tsc --watch",
-        "build": "tsc",
-        "check": "npm run typecheck && npm run lint",
+        "dev": "tsc --watch -p ./tsconfig.prod.json",
+        "build": "tsc -p ./tsconfig.prod.json",
+        "build:all": "tsc",
+        "check": "npm run typecheck:prod && npm run lint:src",
         "test": "node -e \"require('./out/src/test/runTest.js').run().catch(err => { console.error('Tests failed:', err); process.exit(1); })\""
     },
     "mocha": {

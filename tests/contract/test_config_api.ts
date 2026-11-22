@@ -35,6 +35,8 @@ suite('Config API Contract Tests', () => {
         host: 'localhost',
         port: 6333,
         apiKey: '',
+        useHttps: false,
+        enabled: true,
         collection: 'test-collection',
         timeout: 30000,
       };

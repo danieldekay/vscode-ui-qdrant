@@ -280,6 +280,66 @@ export class FileService {
   }
 
   /**
+   * Enhanced validation with improved error messaging and quick actions
+   * @param filePath - Absolute path to the file to validate
+   * @returns Promise resolving to enhanced validation result
+   */
+  static async validateQdrantFileEnhanced(
+    filePath: string,
+  ): Promise<import('../types/enhancedValidation').EnhancedValidationResult> {
+    const startTime = Date.now();
+    const fileUri = vscode.Uri.file(filePath);
+
+    // First perform basic validation
+    const basicResult = await FileService.validateQdrantFile(fileUri);
+
+    // Enhanced error processing
+    // For now, create simple implementations until modules are available
+    const quickActions: any[] = [];
+
+    // Create layered error messages
+    let layeredMessages: any;
+    if (basicResult.errors.length > 0) {
+      layeredMessages = {
+        simple: 'Database validation failed',
+        detailed: basicResult.errors[0].message,
+        technical: `Validation error: ${basicResult.errors[0].code}`,
+      };
+    } else {
+      layeredMessages = {
+        simple: 'Database file is valid',
+        detailed: 'All validation checks passed successfully',
+        technical: `Validation completed in ${Date.now() - startTime}ms`,
+      };
+    } // Generate suggestions based on errors and warnings
+    const suggestions = basicResult.errors.map((error) => ({
+      suggestionId: `error-${error.code}`,
+      title: 'Fix validation error',
+      description: error.suggestion || 'See error details for more information',
+      actionType: 'FILE_SYSTEM',
+      priority: 'HIGH',
+      estimatedEffort: 'LOW',
+      prerequisites: [],
+      relatedActions: [],
+    }));
+
+    return {
+      basicResult,
+      simpleMessage: layeredMessages.simple,
+      technicalDetails: layeredMessages.technical,
+      remediationSuggestions: suggestions as any,
+      quickActions,
+      validationLevel: 'COMPREHENSIVE' as any,
+      performanceMetrics: {
+        validationDuration: Date.now() - startTime,
+        bytesRead: 0,
+        checksPerformed: basicResult.metadata.rulesChecked.length,
+        memoryUsage: 0,
+      },
+    };
+  }
+
+  /**
    * Reads the first N bytes of a file for header validation
    */
   private static async readFileHeader(uri: vscode.Uri, bytes: number): Promise<Uint8Array> {

@@ -33,6 +33,7 @@ export interface IQdrantService {
   disconnect(): Promise<void>;
   isConnected(): boolean;
   getConnectionStatus(): ConnectionStatus;
+  updateLocalDbPath(fileUri: vscode.Uri): Promise<ConfigUpdateResult>;
 
   // Collection Operations
   createCollection(config: CollectionConfig): Promise<void>;
@@ -385,11 +386,11 @@ export class QdrantService implements IQdrantService {
   }
 
   /**
-   * Update the local database file path configuration
+   * Update the local database file path configuration and connect to the database
    * @param fileUri - URI pointing to the new Qdrant database file
    * @returns Promise resolving to configuration update result
    */
-  static async updateLocalDbPath(fileUri: vscode.Uri): Promise<ConfigUpdateResult> {
+  async updateLocalDbPath(fileUri: vscode.Uri): Promise<ConfigUpdateResult> {
     try {
       // Get current configuration
       const config = vscode.workspace.getConfiguration('qdrant');
@@ -406,24 +407,34 @@ export class QdrantService implements IQdrantService {
       // Update configuration with new path
       await config.update('localDbPath', fileUri, vscode.ConfigurationTarget.Workspace);
 
-      // Simulate connection attempt (in real implementation, this would start/connect to local Qdrant server)
-      // For now, we'll assume the connection succeeds if the file path is valid
+      // Try to connect to the local Qdrant database
       let connectionStatus: LocalConnectionStatus;
       let connectionError: ConnectionError | undefined;
 
       try {
         // Basic validation that file exists and is accessible
         await vscode.workspace.fs.stat(fileUri);
+
+        // For local database files, we need to create a local connection
+        // For now, we'll assume a local server running on default port 6333
+        // In a real implementation, this would start a local Qdrant server with the database file
+        const localConfig: QdrantConfig = {
+          url: 'http://localhost:6333',
+          timeout: 5000,
+        };
+
+        // Attempt to connect to local Qdrant server
+        await this.connect(localConfig);
         connectionStatus = LocalConnectionStatus.CONNECTED;
       } catch (error) {
         connectionStatus = LocalConnectionStatus.ERROR;
         connectionError = {
-          code: ConnectionErrorCode.FILE_NOT_FOUND,
-          message: 'Failed to access database file',
+          code: ConnectionErrorCode.NETWORK_ERROR,
+          message: 'Failed to connect to local Qdrant database',
           details: error instanceof Error ? error.message : 'Unknown error',
           timestamp: Date.now(),
           recoverable: true,
-          recoveryAction: 'Check file permissions and path',
+          recoveryAction: 'Ensure Qdrant server is running locally on port 6333',
         };
       }
 

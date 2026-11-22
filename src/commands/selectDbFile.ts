@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
+import { getQdrantService } from '../index';
 import { FileService } from '../services/fileService';
-import { QdrantService } from '../services/qdrant-service';
 import { handleFileError, handleValidationErrors } from '../utils/errorHandling';
 
 /**
@@ -40,24 +40,48 @@ export async function selectLocalDbFile(): Promise<void> {
         progress.report({ increment: 75, message: 'Updating configuration...' });
 
         // Update configuration with the new database path
-        const configResult = await QdrantService.updateLocalDbPath(fileUri);
+        const qdrantService = getQdrantService();
+        const configResult = await qdrantService.updateLocalDbPath(fileUri);
 
         progress.report({ increment: 100, message: 'Complete' });
 
         if (configResult.success) {
-          // Success - show confirmation
+          // Update the local database path and set connection URL to localhost server
+          const config = vscode.workspace.getConfiguration('qdrant');
+          const filePath = fileUri.fsPath;
+          await config.update('localDbPath', filePath, vscode.ConfigurationTarget.Workspace);
+          // Set connection URL to localhost Qdrant server (default)
+          await config.update(
+            'connection.url',
+            'http://localhost:6333',
+            vscode.ConfigurationTarget.Workspace,
+          );
+
+          // Success - show confirmation and refresh collections view
           const fileName = fileUri.path.split('/').pop() || 'database file';
-          vscode.window
-            .showInformationMessage(
-              `Successfully connected to Qdrant database: ${fileName}`,
-              'View Collections',
-              'Close',
-            )
-            .then((selection) => {
-              if (selection === 'View Collections') {
-                vscode.commands.executeCommand('qdrant.showCollections');
-              }
-            });
+
+          // Refresh the collections tree view to show available collections
+          await vscode.commands.executeCommand('qdrantCollections.refresh');
+
+          // Small delay to ensure connection is established before showing success
+          setTimeout(() => {
+            vscode.window
+              .showInformationMessage(
+                `Successfully connected to Qdrant database: ${fileName}`,
+                'View Collections',
+                'Open Configuration',
+                'Close',
+              )
+              .then((selection) => {
+                if (selection === 'View Collections') {
+                  // Focus on the collections view
+                  vscode.commands.executeCommand('qdrantCollections.focus');
+                } else if (selection === 'Open Configuration') {
+                  // Open configuration panel to show the updated URL
+                  vscode.commands.executeCommand('qdrant.openConfig');
+                }
+              });
+          }, 500);
         } else {
           // Configuration update failed
           handleFileError(configResult.error || new Error('Configuration update failed'));

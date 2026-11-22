@@ -13,6 +13,8 @@ Auto-generated from all feature plans. Last updated: 2025-10-01
 - VS Code workspace settings, Qdrant database files (007-configuration-ux-the)
 - TypeScript 5.x with strict mode enabled + @types/vscode (VS Code Extension API), @qdrant/js-client-rest (Qdrant client) (008-local-db-file)
 - Local file system (Qdrant database files) (008-local-db-file)
+- TypeScript 5.x with strict mode enabled (ES2022 target) + @types/vscode, @qdrant/js-client-rest, VS Code Extension API (010-improved-local-qdrant)
+- Local file system validation, VS Code workspace configuration (010-improved-local-qdrant)
 
 ## Project Structure
 ```
@@ -39,9 +41,9 @@ The project provides standardized npm scripts for development and quality assura
 TypeScript 5.x (latest stable) with Node.js LTS 20.x+ runtime: Follow standard conventions
 
 ## Recent Changes
+- 010-improved-local-qdrant: Added TypeScript 5.x with strict mode enabled (ES2022 target) + @types/vscode, @qdrant/js-client-rest, VS Code Extension API
 - 009-qdrant-ux-inside: Added TypeScript 5.x with strict mode enabled + @types/vscode, @qdrant/js-client-rest, VS Code Extension API
 - 008-local-db-file: Added TypeScript 5.x with strict mode enabled + @types/vscode (VS Code Extension API), @qdrant/js-client-rest (Qdrant client)
-- 007-configuration-ux-the: Added TypeScript 5.x with strict mode enabled + @types/vscode, @qdrant/js-client-rest, VS Code Extension API
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

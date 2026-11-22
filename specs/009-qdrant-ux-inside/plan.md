@@ -39,14 +39,14 @@ The Qdrant UX Inside VSCode feature implements a comprehensive search interface 
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x with strict mode enabled  
-**Primary Dependencies**: @types/vscode, @qdrant/js-client-rest, VS Code Extension API  
-**Storage**: VS Code workspace settings, Qdrant database files  
-**Testing**: Mocha with VS Code extension test framework  
-**Target Platform**: VS Code extension host (desktop and web)  
-**Project Type**: VS Code extension  
-**Performance Goals**: UI operations <200ms, search operations depend on Qdrant server response times  
-**Constraints**: Must work in restricted VS Code environments, no external network dependencies for core functionality  
+**Language/Version**: TypeScript 5.x with strict mode enabled
+**Primary Dependencies**: @types/vscode, @qdrant/js-client-rest, VS Code Extension API
+**Storage**: VS Code workspace settings, Qdrant database files
+**Testing**: Mocha with VS Code extension test framework
+**Target Platform**: VS Code extension host (desktop and web)
+**Project Type**: VS Code extension
+**Performance Goals**: UI operations <200ms, search operations depend on Qdrant server response times
+**Constraints**: Must work in restricted VS Code environments, no external network dependencies for core functionality
 **Scale/Scope**: Single VS Code extension with Qdrant search interface
 
 ## Constitution Check
@@ -267,8 +267,8 @@ _This section describes what the /tasks command will do - DO NOT execute during 
 
 _These phases are beyond the scope of the /plan command_
 
-**Phase 3**: Task execution (/tasks command creates tasks.md)  
-**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 3**: Task execution (/tasks command creates tasks.md)
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)
 **Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking

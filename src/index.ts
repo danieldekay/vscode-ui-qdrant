@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
+import { registerOpenConfigCommand } from './commands/open_config';
 import { selectLocalDbFile } from './commands/selectDbFile';
+import { selectLocalDbFileEnhanced } from './commands/selectLocalDbFileEnhanced';
+import { ConfigService } from './services/config_service';
 import { type IQdrantService, QdrantService } from './services/qdrant-service';
 import {
   QdrantAuthenticationError,
@@ -13,6 +16,18 @@ import {
  * Global Qdrant service instance
  */
 let qdrantService: IQdrantService;
+
+/**
+ * Get the global Qdrant service instance
+ */
+export function getQdrantService(): IQdrantService {
+  return qdrantService;
+}
+
+/**
+ * Global config service instance
+ */
+let configService: ConfigService;
 
 /**
  * Connect to Qdrant using VS Code configuration
@@ -73,6 +88,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Initialize Qdrant service
   qdrantService = new QdrantService();
+
+  // Initialize config service
+  configService = new ConfigService();
 
   // Auto-connect if configured
   const autoConnect = vscode.workspace.getConfiguration('qdrant').get('ui.autoConnect', false);
@@ -198,6 +216,12 @@ function registerCommands(context: vscode.ExtensionContext) {
     selectLocalDbFile,
   );
 
+  // Register Qdrant: Select Local Database File Enhanced command
+  const selectLocalDbFileEnhancedCommand = vscode.commands.registerCommand(
+    'qdrant.selectLocalDbFileEnhanced',
+    selectLocalDbFileEnhanced,
+  );
+
   // Register Qdrant: Disconnect command
   const disconnectCommand = vscode.commands.registerCommand('qdrant.disconnect', async () => {
     try {
@@ -211,13 +235,18 @@ function registerCommands(context: vscode.ExtensionContext) {
     }
   });
 
+  // Register Qdrant: Open Config command
+  const openConfigCommand = registerOpenConfigCommand(context, configService);
+
   // Add all commands to subscriptions
   context.subscriptions.push(
     openSearchCommand,
     openCollectionsCommand,
     connectCommand,
     selectLocalDbFileCommand,
+    selectLocalDbFileEnhancedCommand,
     disconnectCommand,
+    openConfigCommand,
   );
 }
 
